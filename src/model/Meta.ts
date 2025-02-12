@@ -1,0 +1,201 @@
+import { DatabaseModel } from "./DatabaseModel";
+
+// armazenei o pool de conexões
+const database = new DatabaseModel().pool;
+
+/**
+ * Classe que representa uma meta.
+ */
+export class Meta {
+
+    /* Atributos */
+    /* Identificador da meta */
+    private idMeta: number = 0;
+    /* Nome da meta */
+    private nomeMeta: string;
+    /* Data inicial da meta */
+    private dataInicial: Date;
+    /* Data final da meta */
+    private dataFinal: Date;
+    /* Categorizaçao da meta */
+    private categorizacao: string;
+    /* Valor da meta */
+    private valor: number;
+
+    /**
+     * Construtor da classe Meta
+     * 
+     * @param nomeMeta Nome da meta
+     * @param dataInicial Data inicial da meta
+     * @param dataFinal Data final da meta
+     * @param categorizacao Categorizaçao da meta
+     * @param valor Valor da meta
+     */
+    constructor(
+        nomeMeta: string,
+        dataInicial: Date,
+        dataFinal: Date,
+        categorizacao: string,
+        valor: number
+    ) {
+        this.nomeMeta = nomeMeta;
+        this.dataInicial = dataInicial;
+        this.dataFinal = dataFinal;
+        this.categorizacao = categorizacao;
+        this.valor = valor;
+    }
+
+    /* Métodos get e set */
+    /**
+     * Recupera o identificador da meta
+     * @returns o identificador da meta
+     */
+    public getIdMeta(): number {
+        return this.idMeta;
+    }
+
+    /**
+     * Atribui um valor ao identificador da meta
+     * @param idMeta novo identificador da meta
+     */
+    public setIdMeta(idMeta: number): void {
+        this.idMeta = idMeta;
+    }
+
+    /**
+     * Recupera o nome da meta.
+     *
+     * @returns O nome da meta.
+     */
+    public getNomeMeta(): string {
+        return this.nomeMeta;
+    }
+
+    /**
+     * Define o nome da meta.
+     * 
+     * @param nomeMeta - O nome da meta a ser definido.
+     */
+    public setNomeMeta(nomeMeta: string): void {
+        this.nomeMeta = nomeMeta;
+    }
+
+    /**
+     * Retorna a data inicial da meta.
+     *
+     * @returns A data inicial da meta.
+     */
+    public getDataInicial(): Date {
+        return this.dataInicial;
+    }
+
+    /**
+     * Define a data inicial da meta.
+     *
+     * @param dataInicial - A data inicial da meta.
+     */
+    public setDataInicial(dataInicial: Date): void {
+        this.dataInicial = dataInicial;
+    }
+
+    /**
+     * Retorna a data final da meta.
+     *
+     * @returns A data final da meta.
+     */
+    public getDataFinal(): Date {
+        return this.dataFinal;
+    }
+
+    /**
+     * Define a data final da meta.
+     *
+     * @param dataFinal - A data final da meta.
+     */
+    public setDataFinal(dataFinal: Date): void {
+        this.dataFinal = dataFinal;
+    }
+
+    /**
+     * Retorna a categorização da meta.
+     *
+     * @returns A categorização da meta.
+     */
+    public getCategorizacao(): string {
+        return this.categorizacao;
+    }
+
+    /**
+     * Define a categorização da meta.
+     *
+     * @param categorizacao - A categorização.
+     */
+    public setCategorizacao(categorizacao: string): void {
+        this.categorizacao = categorizacao;
+    }
+
+    /**
+     * Retorna o valor da meta.
+     *
+     * @returns O valor da meta.
+     */
+    public getValor(): number {
+        return this.valor;
+    }
+
+    /**
+     * Define o valor da meta.
+     *
+     * @param valor - O valor da meta.
+     */
+    public setValor(valor: number): void {
+        this.valor = valor;
+    }
+
+    /**
+     * Busca e retorna uma lista de metas do banco de dados.
+     * @returns Um array de objetos do tipo `Meta` em caso de sucesso ou `null` se ocorrer um erro durante a consulta.
+     * 
+     * - A função realiza uma consulta SQL para obter todas as informações da tabela "meta".
+     * - Os dados retornados do banco de dados são usados para instanciar objetos da classe `Meta`.
+     * - Cada meta é adicionada a uma lista que será retornada ao final da execução.
+     * - Se houver falha na consulta ao banco, a função captura o erro, exibe uma mensagem no console e retorna `null`.
+     */
+    static async listarMetas(): Promise<Array<Meta> | null> {
+        // objeto para armazenar a lista de metas
+        const listaDeMetas: Array<Meta> = [];
+
+        try {
+            // query de consulta ao banco de dados
+            const querySelectMeta = `SELECT * FROM meta;`;
+
+            // fazendo a consulta e guardando a resposta
+            const respostaBD = await database.query(querySelectMeta);
+
+            // usando a resposta para instanciar um objeto do tipo Meta
+            respostaBD.rows.forEach((linha) => {
+                // instancia (cria) objeto Meta
+                const novaMeta = new Meta(
+                    linha.nome_meta,
+                    linha.data_inicial,
+                    linha.data_final,
+                    linha.categorizacao,
+                    linha.valor
+                );
+
+                // atribui o ID objeto
+                novaMeta.setIdMeta(linha.id_meta);
+
+                // adiciona o objeto na lista
+                listaDeMetas.push(novaMeta);
+            });
+
+            // retorna a lista de metas
+            return listaDeMetas;
+        } catch (error) {
+            console.log('Erro ao buscar lista de metas. Verifique os logs para mais detalhes.');
+            console.log(error);
+            return null;
+        }
+    }
+}
