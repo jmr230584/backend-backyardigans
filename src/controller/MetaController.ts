@@ -2,9 +2,9 @@ import { Request, Response } from "express";
 import { Meta } from "../model/Meta";
 
 interface MetaDTO {
-    nome_meta: string;
-    data_inicial: Date;
-    data_final: Date;
+    nomeMeta: string;
+    dataInicial: Date;
+    dataFinal: Date;
     categorizacao: string;
     valor: number;
 }
@@ -64,9 +64,9 @@ export class MetaController extends Meta {
 
             // instanciando um objeto do tipo meta com as informações recebidas
             const novaMeta = new Meta(
-                metaRecebida.nome_meta,
-                metaRecebida.data_inicial,
-                metaRecebida.data_final,
+                metaRecebida.nomeMeta,
+                metaRecebida.dataInicial,
+                metaRecebida.dataFinal,
                 metaRecebida.categorizacao,
                 metaRecebida.valor,
             );
@@ -162,9 +162,9 @@ export class MetaController extends Meta {
 
             // Cria um novo objeto meta com os dados recebidos.
             const metaAtualizado = new Meta(
-                metaRecebida.nome_meta,
-                metaRecebida.data_inicial,
-                metaRecebida.data_final,
+                metaRecebida.nomeMeta,
+                metaRecebida.dataInicial,
+                metaRecebida.dataFinal,
                 metaRecebida.categorizacao,
                 metaRecebida.valor,
             );
