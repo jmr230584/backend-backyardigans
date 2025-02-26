@@ -27,6 +27,7 @@ router.get("/lista/metas", MetaController.lista);
 * ROTAS PARA BANCO
 */ 
 router.get("/lista/bancos", BancoController.lista);
+router.post("/novo/bancos", BancoController.novo);
 
 
 export { router };
