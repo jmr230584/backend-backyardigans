@@ -15,6 +15,7 @@ router.get("/", (req: Request, res: Response)=> {
 * ROTAS PARA CLIENTE
 */ 
 router.get("/lista/clientes", ClienteController.lista);
+router.post("/novo/cliente", ClienteController.novo)
 
 
 /* 

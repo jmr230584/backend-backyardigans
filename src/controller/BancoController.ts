@@ -10,6 +10,8 @@ interface BancoDTO {
     dividas: number;
 }
 
+
+
 /**
  * A classe `BancoController` extende a classe `Banco` e é responsável por controlar as requisições relacionadas às contas bancárias.
  * 
@@ -53,7 +55,7 @@ export class BancoController extends Banco {
      * 
      * @throws {Error} - Se ocorrer um erro no cadastro, o erro é registrado no console e uma resposta 400 é enviada.
      */
-    static async novo(req: Request, res: Response): Promise<any> {
+      static async novo(req: Request, res: Response): Promise<any> {
         try {
             // recuperando informações do corpo da requisição e colocando em um objeto da interface BancoDTO
             const bancoRecebido: BancoDTO = req.body;
@@ -87,4 +89,8 @@ export class BancoController extends Banco {
             return res.status(400).json({ mensagem: "Não foi possível cadastrar o banco. Entre em contato com o administrador do sistema." });
         }
     }
+
 }
+
+
+
