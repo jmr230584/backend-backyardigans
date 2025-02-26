@@ -2,8 +2,8 @@ import { Request, Response } from "express";
 import { Cliente } from "../model/Cliente";
 
 interface ClienteDTO {
-    nome_cliente: string,
-    data_nascimento: Date,
+    nomeCliente: string,
+    dataNascimento: Date,
     celular: string,
     email: string,
     senha: string
@@ -64,8 +64,8 @@ static async novo(req: Request, res: Response): Promise<any> {
         const clienteRecebido: ClienteDTO = req.body;
 
         // instanciando um objeto do tipo cliente com as informações recebidas
-        const novoCliente = new Cliente(clienteRecebido.nome_cliente, 
-                                    clienteRecebido.data_nascimento, 
+        const novoCliente = new Cliente(clienteRecebido.nomeCliente, 
+                                    clienteRecebido.dataNascimento, 
                                     clienteRecebido.celular, 
                                     clienteRecebido.email,
                                     clienteRecebido.senha);
