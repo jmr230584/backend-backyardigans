@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Banco } from "../model/Banco";
-import { Cliente } from "../model/cliente"; 
+import { Cliente } from "../model/Cliente"; 
 import { Meta } from "../model/Meta";
 
 interface BancoDTO {
@@ -11,6 +11,8 @@ interface BancoDTO {
     transacao: number;
     dividas: number;
 }
+
+
 
 /**
  * A classe `BancoController` extende a classe `Banco` e é responsável por controlar as requisições relacionadas às contas bancárias.
@@ -42,4 +44,10 @@ export class BancoController extends Banco {
             return res.status(400).json({ mensagem: "Não foi possível acessar a listagem de contas bancárias" });
         }
     }
+
+
+    
 }
+
+
+
