@@ -173,18 +173,18 @@ export class Meta {
             const respostaBD = await database.query(querySelectMeta);
 
             // usando a resposta para instanciar um objeto do tipo Meta
-            respostaBD.rows.forEach((linha) => {
+            respostaBD.rows.forEach((meta: any) => {
                 // instancia (cria) objeto Meta
                 const novaMeta = new Meta(
-                    linha.nome_meta,
-                    linha.data_inicial,
-                    linha.data_final,
-                    linha.categorizacao,
-                    linha.valor
+                    meta.nome_meta,
+                    meta.data_inicial,
+                    meta.data_final,
+                    meta.categorizacao,
+                    meta.valor
                 );
 
                 // atribui o ID objeto
-                novaMeta.setIdMeta(linha.id_meta);
+                novaMeta.setIdMeta(meta.id_meta);
 
                 // adiciona o objeto na lista
                 listaDeMetas.push(novaMeta);
@@ -192,10 +192,157 @@ export class Meta {
 
             // retorna a lista de metas
             return listaDeMetas;
+
         } catch (error) {
             console.log('Erro ao buscar lista de metas. Verifique os logs para mais detalhes.');
             console.log(error);
             return null;
+        }
+    }
+
+    /**
+     * Realiza o cadastro de uma meta no banco de dados.
+     * 
+     * Esta função recebe um objeto do tipo `Meta` e insere seus dados (nomeMeta, dataInicial, dataFinal, 
+     * categorizacao, valor)
+     * na tabela `meta` do banco de dados. O método retorna um valor booleano indicando se o cadastro 
+     * foi realizado com sucesso.
+     * 
+     * @param {Livro} livro - Objeto contendo os dados da meta que será cadastrado. O objeto `Livro`
+     *                        deve conter os métodos `getNomeMeta()`, `getDataInicial()`, `getDataFinal()`, `getCategorizacao()`,
+     *                        `getValor()`
+     *                        que retornam os respectivos valores da meta.
+     * @returns {Promise<boolean>} - Retorna `true` se a meta foi cadastrado com sucesso e `false` caso contrário.
+     *                               Em caso de erro durante o processo, a função trata o erro e retorna `false`.
+     * 
+     * @throws {Error} - Se ocorrer algum erro durante a execução do cadastro, uma mensagem de erro é exibida
+     *                   no console junto com os detalhes do erro.
+     */
+    static async cadastroMeta(meta: Meta): Promise<boolean> {
+        try {
+            // query para fazer insert de uma meta no banco de dados
+            const queryInsertMeta = `INSERT INTO meta (nome_meta, data_inicial, data_final, 
+                                     categorizacao, valor)
+                                    VALUES
+                                    ('${meta.getNomeMeta()}', 
+                                    '${meta.getDataInicial()}',
+                                    '${meta.getDataFinal()}',
+                                    '${meta.getCategorizacao()}',
+                                    '${meta.getValor()}',
+                                   )
+                                    RETURNING id_meta;`;
+
+            // executa a query no banco e armazena a resposta
+            const respostaBD = await database.query(queryInsertMeta);
+
+            // verifica se a quantidade de linhas modificadas é diferente de 0
+            if (respostaBD.rowCount != 0) {
+                console.log(`Meta cadastrado com sucesso! ID da Meta: ${respostaBD.rows[0].id_meta}`);
+                // true significa que o cadastro foi feito
+                return true;
+            }
+            // false significa que o cadastro NÃO foi feito.
+            return false;
+
+            // tratando o erro
+        } catch (error) {
+            // imprime outra mensagem junto com o erro
+            console.log('Erro ao cadastrar a meta. Verifique os logs para mais detalhes.');
+            // imprime o erro no console
+            console.log(error);
+            // retorno um valor falso
+            return false;
+        }
+    }
+
+    /**
+       * Remove uma meta do banco de dados com base no ID fornecido.
+       * 
+       * Esta função executa uma operação de exclusão na tabela meta para remover um registro cujo id_meta 
+       * corresponda ao valor fornecido. Ela retorna um valor booleano indicando o sucesso ou a falha da operação.
+       * 
+       * @param {number} idMeta - O identificador único da meta que será removido do banco de dados.
+       * @returns {Promise<boolean>} - Retorna true se a meta foi removido com sucesso, ou false caso contrário.
+       *                                Em caso de erro, a função trata a exceção e retorna false.
+       * 
+       * @throws {Error} - Exibe uma mensagem de erro no console e os detalhes do erro caso a remoção falhe.
+       */
+
+    static async removerMeta(idMeta: number): Promise<boolean> {
+        try {
+            // Cria uma query SQL para deletar a meta do banco de dados baseado no ID.
+            const queryDeleteMeta = `DELETE FROM meta WHERE id_meta = ${idMeta}`;
+
+            // Executa a query no banco de dados e armazena a resposta.
+            const respostaBD = await database.query(queryDeleteMeta);
+
+            // Verifica se alguma linha foi afetada pela operação de exclusão.
+            if (respostaBD.rowCount != 0) {
+                // Loga uma mensagem de sucesso no console indicando que o livro foi removido.
+                console.log(`Meta removido com sucesso! ID removido: ${idMeta}`);
+                // Retorna true para indicar sucesso na remoção.
+                return true;
+            }
+
+            // Retorna false se nenhuma linha foi afetada (nenhum meta removida).
+            return false;
+
+        } catch (error) {
+            // Exibe uma mensagem de erro no console caso ocorra uma exceção.
+            console.log('Erro ao remover meta. Verifique os logs para mais detalhes.');
+            // Loga o erro no console para depuração.
+            console.log(error);
+            // Retorna false indicando que a remoção falhou.
+            return false;
+        }
+    }
+
+    /**
+     * Atualiza os dados de uma meta no banco de dados.
+     * 
+     * Esta função atualiza as informações de uma meta na tabela meta com base nos valores do objeto 
+     * meta fornecido. Ela verifica se a operação foi bem-sucedida e retorna um valor booleano.
+     * 
+     * @param {meta} meta - Objeto contendo os dados atualizados do meta. O objeto deve possuir os métodos 
+     *                         `getNomeMeta()`, `getDataInicial()`, `getDataFinal()`, `getCategorizacao()`,
+     *                        `getValor()` para acessar 
+     *                        as informações da meta.
+     * @returns {Promise<boolean>} - Retorna true se os dados da meta foram atualizados com sucesso ou false 
+     *                                caso contrário. Em caso de erro, a função trata a exceção e retorna false.
+     * 
+     * @throws {Error} - Exibe uma mensagem de erro no console e os detalhes do erro caso a atualização falhe.
+     */
+    static async atualizarMeta(meta: Meta): Promise<boolean> {
+        try {
+            // Cria uma query SQL para atualizar os dados da meta no banco de dados.
+            const queryUpdateMeta = `UPDATE meta SET
+                                nome_meta = '${meta.getNomeMeta()}',
+                                data_inicial = '${meta.getDataInicial()}',
+                                data_final = '${meta.getDataFinal()}',
+                                categorizacao = '${meta.getCategorizacao()}',
+                                valor = '${meta.getValor()}',
+                                WHERE id_meta = '${meta.getIdMeta()}'`;
+
+            // Executa a query no banco de dados e armazena a resposta.
+            const respostaBD = await database.query(queryUpdateMeta);
+
+            // Verifica se alguma linha foi alterada pela operação de atualização.
+            if (respostaBD.rowCount != 0) {
+                // Loga uma mensagem de sucesso no console indicando que a meta foi atualizado.
+                console.log(`Meta atualizado com sucesso! ID: ${meta.getIdMeta()}`);
+                // Retorna true para indicar sucesso na atualização.
+                return true;
+            }
+            // Retorna false se nenhuma linha foi alterada (atualização não realizada).
+            return false;
+
+        } catch (error) {
+            // Exibe uma mensagem de erro no console caso ocorra uma exceção.
+            console.log('Erro ao atualizar a meta. Verifique os logs para mais detalhes.');
+            // Loga o erro no console para depuração.
+            console.log(error);
+            // Retorna false indicando que a atualização falhou.
+            return false;
         }
     }
 }

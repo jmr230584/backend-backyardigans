@@ -196,7 +196,7 @@ export class Banco {
             const respostaBD = await database.query(querySelectBanco);
 
             // usando a resposta para instanciar um objeto do tipo Banco
-            respostaBD.rows.forEach((linha) => {
+            respostaBD.rows.forEach((linha: { id_cliente: number; id_meta: number; nome_banco: string; saldo: number; transacao: number; dividas: number; id_banco: number; }) => {
                 // instancia (cria) objeto Banco
                 const novoBanco = new Banco(
                     linha.id_cliente,
