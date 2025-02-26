@@ -1,16 +1,16 @@
 import { Request, Response } from "express";
 import { Banco } from "../model/Banco";
-import { Cliente } from "../model/cliente"; 
-import { Meta } from "../model/Meta";
 
 interface BancoDTO {
-    id_cliente: number;
-    id_meta: number;
-    nome_banco: string;
+    idCliente: number;
+    idMeta: number;
+    nomeBanco: string;
     saldo: number;
     transacao: number;
     dividas: number;
 }
+
+
 
 /**
  * A classe `BancoController` extende a classe `Banco` e é responsável por controlar as requisições relacionadas às contas bancárias.
@@ -42,4 +42,55 @@ export class BancoController extends Banco {
             return res.status(400).json({ mensagem: "Não foi possível acessar a listagem de contas bancárias" });
         }
     }
+
+    /**
+     * Controller para cadastrar um novo banco.
+     * 
+     * Este método recebe os dados do banco via requisição HTTP, instancia um objeto `Banco`
+     * e tenta cadastrá-lo no banco de dados. Retorna um status 200 em caso de sucesso ou 400 em caso de erro.
+     * 
+     * @param {Request} req - Requisição HTTP contendo os dados do banco no formato `BancoDTO`.
+     * @param {Response} res - Resposta HTTP usada para retornar o status e a mensagem ao cliente.
+     * @returns {Promise<Response>} - Resposta HTTP com status 200 em caso de sucesso ou 400 em caso de erro.
+     * 
+     * @throws {Error} - Se ocorrer um erro no cadastro, o erro é registrado no console e uma resposta 400 é enviada.
+     */
+      static async novo(req: Request, res: Response): Promise<any> {
+        try {
+            // recuperando informações do corpo da requisição e colocando em um objeto da interface BancoDTO
+            const bancoRecebido: BancoDTO = req.body;
+
+            // instanciando um objeto do tipo banco com as informações recebidas
+            const novoBanco = new Banco(
+                bancoRecebido.idCliente,
+                bancoRecebido.idMeta,
+                bancoRecebido.nomeBanco,
+                bancoRecebido.saldo,
+                bancoRecebido.transacao,
+                bancoRecebido.dividas
+            );
+
+            // Chama a função de cadastro passando o objeto como parâmetro
+            const respostaClasse = await Banco.cadastroBanco(novoBanco);
+
+            // verifica a resposta da função
+            if (respostaClasse) {
+                // retornar uma mensagem de sucesso
+                return res.status(200).json({ mensagem: "Banco cadastrado com sucesso!" });
+            } else {
+                // retorno uma mensagem de erro
+                return res.status(400).json({ mensagem: "Erro ao cadastrar o banco. Entre em contato com o administrador do sistema." });
+            }
+        } catch (error) {
+            // lança uma mensagem de erro no console
+            console.log(`Erro ao cadastrar um banco. ${error}`);
+
+            // retorna uma mensagem de erro a quem chamou a mensagem
+            return res.status(400).json({ mensagem: "Não foi possível cadastrar o banco. Entre em contato com o administrador do sistema." });
+        }
+    }
+
 }
+
+
+

@@ -198,4 +198,57 @@ export class Cliente {
             return null;
         }
     }
+
+
+    /**
+     * Realiza o cadastro de um cliente no banco de dados.
+     * 
+     * Esta função recebe um objeto do tipo `Cliente` e insere seus dados (nome_cliente, data_nascimento, celular, email e senha)
+     * na tabela `cliente` do banco de dados. O método retorna um valor booleano indicando se o cadastro 
+     * foi realizado com sucesso.
+     * 
+     * @param {Cliente} cliente - Objeto contendo os dados do aluno que será cadastrado. O objeto `Cliente`
+     *                        deve conter os métodos `getNomeCliente()`, `getDataNascimento()`, `getCelular()`, `getEmail` e `getSenha`
+     *                        que retornam os respectivos valores do cliente.
+     * @returns {Promise<boolean>} - Retorna `true` se o cliente foi cadastrado com sucesso e `false` caso contrário.
+     *                               Em caso de erro durante o processo, a função trata o erro e retorna `false`.
+     * 
+     * @throws {Error} - Se ocorrer algum erro durante a execução do cadastro, uma mensagem de erro é exibida
+     *                   no console junto com os detalhes do erro.
+     */
+    static async cadastroCliente(cliente: Cliente): Promise<boolean> {
+        try {
+            // query para fazer insert de um cliente no banco de dados
+            const queryInsertCliente = `INSERT INTO cliente (nome_cliente, data_nascimento, celular, email, senha)
+                                    VALUES
+                                        ('${cliente.getNomeCliente()}', 
+                                        '${cliente.getDataNascimento()}', 
+                                        '${cliente.getCelular()}', 
+                                        '${cliente.getEmail()}',
+                                        '${cliente.getSenha()}')
+                                        RETURNING id_cliente;`;
+
+            // executa a query no banco e armazena a resposta
+            const respostaBD = await database.query(queryInsertCliente);
+
+
+            // verifica se a quantidade de linhas modificadas é diferente de 0
+            if (respostaBD.rowCount != 0) {
+                console.log(`Cliente cadastrado com sucesso! ID do cliente: ${respostaBD.rows[0].id_cliente}`);
+                // true significa que o cadastro foi feito
+                return true;
+            }
+            // false significa que o cadastro NÃO foi feito.
+            return false;
+
+            // tratando o erro
+        } catch (error) {
+            // imprime outra mensagem junto com o erro
+            console.log('Erro ao cadastrar o cliente. Verifique os logs para mais detalhes.');
+            // imprime o erro no console
+            console.log(error);
+            // retorno um valor falso
+            return false;
+        }
+    }
 }

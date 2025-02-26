@@ -15,6 +15,7 @@ router.get("/", (req: Request, res: Response)=> {
 * ROTAS PARA CLIENTE
 */ 
 router.get("/lista/clientes", ClienteController.lista);
+router.post("/novo/cliente", ClienteController.novo)
 
 
 /* 
@@ -34,6 +35,7 @@ router.put("/atualizar/metas/:idMeta", MetaController.atualizar);
 * ROTAS PARA BANCO
 */ 
 router.get("/lista/bancos", BancoController.lista);
+router.post("/novo/bancos", BancoController.novo);
 
 
 export { router };

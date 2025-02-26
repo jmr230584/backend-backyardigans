@@ -222,4 +222,39 @@ export class Banco {
             return null;
         }
     }
+
+    static async cadastroBanco(banco: Banco): Promise<boolean> {
+        try {
+            // query para inserir um banco no banco de dados
+            const queryInsertBanco = `INSERT INTO banco (id_cliente, id_meta, nome_banco, saldo, transacao, dividas)
+                                    VALUES
+                                    ('${banco.getIdCliente()}', 
+                                    '${banco.getIdMeta()}', 
+                                    '${banco.getNomeBanco()}', 
+                                    '${banco.getSaldo()}',
+                                    '${banco.getTransacao()}',
+                                    '${banco.getDividas()}')
+                                    RETURNING id_banco;`;
+
+            // executa a query no banco e armazena a resposta
+            const respostaBD = await database.query(queryInsertBanco);
+
+            // verifica se a quantidade de linhas modificadas é diferente de 0
+            if (respostaBD.rowCount !== 0) {
+                // imprime o ID do banco cadastrado
+                console.log(`Banco cadastrado com sucesso! ID do banco: ${respostaBD.rows[0].id_banco}`);
+                // true significa que o cadastro foi feito
+                return true;
+            }
+
+            // false significa que o cadastro NÃO foi feito
+            return false;
+        } catch (error) {
+            // imprime mensagem de erro junto com o log
+            console.log('Erro ao cadastrar o banco. Verifique os logs para mais detalhes.');
+            console.log(error);
+            // retorna valor falso em caso de falha
+            return false;
+        }
+    }
 }
