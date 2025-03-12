@@ -231,9 +231,9 @@ export class Banco {
                                     ('${banco.getIdCliente()}', 
                                     '${banco.getIdMeta()}', 
                                     '${banco.getNomeBanco()}', 
-                                    '${banco.getSaldo()}',
-                                    '${banco.getTransacao()}',
-                                    '${banco.getDividas()}')
+                                    ${banco.getSaldo()},
+                                    ${banco.getTransacao()},
+                                    ${banco.getDividas()})
                                     RETURNING id_banco;`;
 
             // executa a query no banco e armazena a resposta

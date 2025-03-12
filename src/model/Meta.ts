@@ -228,7 +228,7 @@ export class Meta {
                                     '${meta.getDataInicial()}',
                                     '${meta.getDataFinal()}',
                                     '${meta.getCategorizacao()}',
-                                    '${meta.getValor()}'
+                                    ${meta.getValor()}
                                    )
                                     RETURNING id_meta;`;
 
