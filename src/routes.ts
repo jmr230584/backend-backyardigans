@@ -25,11 +25,6 @@ router.post("/novo/cliente", ClienteController.novo)
 router.get("/lista/metas", MetaController.lista);
 // Rota para adicionar meta
 router.post("/nova/meta", MetaController.nova);
-// Rota para deletar meta
-router.delete("/delete/metas/:idMeta", MetaController.remover);
-// Rota para atualizar meta
-router.put("/atualizar/metas/:idMeta", MetaController.atualizar);
-
 
 /* 
 * ROTAS PARA BANCO
