@@ -27,8 +27,8 @@ router.put("/atualizar/cliente", ClienteController.atualizar);
 router.get("/lista/metas", MetaController.lista);
 // Rota para adicionar meta
 router.post("/nova/meta", MetaController.nova);
-router.post("/atualizar/meta", MetaController.atualizar);
-router.post("/remover/meta", MetaController.remover);
+router.put("/atualizar/meta", MetaController.atualizar);
+router.put("/remover/meta", MetaController.remover);
 
 /* 
 * ROTAS PARA BANCO
