@@ -21,6 +21,8 @@ export class Cliente {
     private email: string;
     /* Senha do cliente */
     private senha: string;
+    /*Controla o status do cliente */
+    private statusCliente: boolean = true;
 
     /**
      * Construtor da classe Cliente
@@ -30,6 +32,7 @@ export class Cliente {
      * @param celular Celular do cliente
      * @param email Email do cliente
      * @param senha Senha do cliente
+     * @param statusCliente status cliente
      */
     constructor(
         nomeCliente: string,
@@ -153,6 +156,24 @@ export class Cliente {
     }
 
     /**
+     * Retorna o status do cliente no sistema
+     * 
+     * @return Status do cliente no sistema
+     */
+    public getStatusCliente(): boolean {
+        return this.statusCliente;
+    }
+
+    /**
+     * Atribui um valor ao status do cliente
+     * 
+     * @param _statusCliente : Valor a ser atribuido ao status do cliente
+     */
+    public setStatusCliente(_statusCliente: boolean) {
+        this.statusCliente = _statusCliente;
+    }
+
+    /**
      * Busca e retorna uma lista de clientes do banco de dados.
      * @returns Um array de objetos do tipo `Cliente` em caso de sucesso ou `null` se ocorrer um erro durante a consulta.
      * 
@@ -167,7 +188,7 @@ export class Cliente {
 
         try {
             // query de consulta ao banco de dados
-            const querySelectCliente = `SELECT * FROM cliente;`;
+            const querySelectCliente = `SELECT * FROM cliente WHERE status_cliente = TRUE;`;
 
             // fazendo a consulta e guardando a resposta
             const respostaBD = await database.query(querySelectCliente);
@@ -180,12 +201,12 @@ export class Cliente {
                     linha.data_nascimento,
                     linha.celular,
                     linha.email,
-                    linha.senha
+                    linha.senha,
                 );
 
                 // atribui o ID objeto
                 novoCliente.setIdCliente(linha.id_cliente);
-
+                novoCliente.setStatusCliente(linha.status_cliente);
                 // adiciona o objeto na lista
                 listaDeClientes.push(novoCliente);
             });
@@ -249,6 +270,83 @@ export class Cliente {
             console.log(error);
             // retorno um valor falso
             return false;
+        }
+    }
+
+    /**
+     * Remove um cliente do banco de dados
+     * @param idCliente ID do cliente a ser removido
+     * @returns Boolean indicando se a remoção foi bem-sucedida
+    */
+    static async removerCliente(id_cliente: number): Promise<Boolean> {
+        // variável para controle de resultado da consulta (query)
+        let queryResult = false;
+    
+        try {
+            // Cria a consulta (query) para remover o cliente
+            const queryDeleteBancoCliente = `UPDATE banco 
+                                                    SET status_banco = FALSE
+                                                    WHERE id_cliente=${id_cliente};`;
+
+            // remove o banco associado ao cliente
+            await database.query(queryDeleteBancoCliente);
+
+            // Construção da query SQL para deletar o cliente.
+            const queryDeleteCliente = `UPDATE cliente 
+                                        SET status_cliente = FALSE
+                                        WHERE id_cliente=${id_cliente};`;
+    
+            // Executa a query de exclusão e verifica se a operação foi bem-sucedida.
+            await database.query(queryDeleteCliente)
+            .then((result) => {
+                if (result.rowCount != 0) {
+                    queryResult = true; // Se a operação foi bem-sucedida, define queryResult como true.
+                }
+            });
+    
+            // retorna o resultado da query
+            return queryResult;
+
+        // captura qualquer erro que aconteça
+        } catch (error) {
+            // Em caso de erro na consulta, exibe o erro no console e retorna false.
+            console.log(`Erro na consulta: ${error}`);
+            // retorna false
+            return queryResult;
+        }
+    }
+
+
+     /**
+     * Atualiza os dados de um cliente no banco de dados.
+     * @param cliente Objeto do tipo cliente com os novos dados
+     * @returns true caso sucesso, false caso erro
+     */
+    static async atualizarCadastroCliente(cliente: Cliente): Promise<Boolean> {
+        let queryResult = false; // Variável para armazenar o resultado da operação.
+        try {
+            // Construção da query SQL para atualizar os dados do cliente no banco de dados.
+            const queryAtualizarCliente = `UPDATE Cliente SET 
+                                            nome_cliente = '${cliente.getNomeCliente().toUpperCase()}', 
+                                            data_nascimento = '${cliente.getDataNascimento()}',
+                                            celular = '${cliente.getCelular()}', 
+                                            email = '${cliente.getEmail().toLowerCase()}'                                            
+                                        WHERE id_cliente = ${cliente.idCliente}`;
+
+            // Executa a query de atualização e verifica se a operação foi bem-sucedida.
+            await database.query(queryAtualizarCliente)
+            .then((result) => {
+                if (result.rowCount != 0) {
+                    queryResult = true; // Se a operação foi bem-sucedida, define queryResult como true.
+                }
+            });
+
+            // Retorna o resultado da operação para quem chamou a função.
+            return queryResult;
+        } catch (error) {
+            // Em caso de erro na consulta, exibe o erro no console e retorna false.
+            console.log(`Erro na consulta: ${error}`);
+            return queryResult;
         }
     }
 }

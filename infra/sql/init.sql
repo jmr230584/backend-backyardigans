@@ -28,6 +28,12 @@ CREATE TABLE banco(
     FOREIGN KEY (id_meta) REFERENCES meta(id_meta)
 );
 
+
+ALTER TABLE cliente ADD COLUMN status_cliente BOOLEAN DEFAULT TRUE
+ALTER TABLE meta ADD COLUMN status_meta BOOLEAN DEFAULT TRUE
+ALTER TABLE banco ADD COLUMN status_banco BOOLEAN DEFAULT TRUE
+
+
 INSERT INTO cliente (nome_cliente, data_nascimento, celular, email, senha) VALUES
 ('Percy Jackson', '1993-08-18', '16994569234', 'percy@olympus.com', 'trident123'),
 ('Hermione Granger', '1979-09-19', '16995604355', 'hermione@hogwarts.com', 'leviosa123'),

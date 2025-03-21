@@ -15,7 +15,9 @@ router.get("/", (req: Request, res: Response)=> {
 * ROTAS PARA CLIENTE
 */ 
 router.get("/lista/clientes", ClienteController.lista);
-router.post("/novo/cliente", ClienteController.novo)
+router.post("/novo/cliente", ClienteController.novo);
+router.put("/remover/cliente", ClienteController.remover);
+router.put("/atualizar/cliente", ClienteController.atualizar);
 
 
 /* 
@@ -25,10 +27,6 @@ router.post("/novo/cliente", ClienteController.novo)
 router.get("/lista/metas", MetaController.lista);
 // Rota para adicionar meta
 router.post("/nova/meta", MetaController.nova);
-// Rota para atualizar meta
-router.put("/atualizar/meta/", MetaController.atualizar);
-// Rota para deletar meta
-router.put("/remover/meta/", MetaController.remover);
 
 /* 
 * ROTAS PARA BANCO
