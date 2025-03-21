@@ -15,7 +15,9 @@ router.get("/", (req: Request, res: Response)=> {
 * ROTAS PARA CLIENTE
 */ 
 router.get("/lista/clientes", ClienteController.lista);
-router.post("/novo/cliente", ClienteController.novo)
+router.post("/novo/cliente", ClienteController.novo);
+router.put("/remover/cliente", ClienteController.remover);
+router.put("/atualizar/cliente", ClienteController.atualizar);
 
 
 /* 
