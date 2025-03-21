@@ -61,7 +61,7 @@ export class MetaController extends Meta {
         try {
             // recuperando informações do corpo da requisição e colocando em um objeto da interface MetaDTO
             const metaRecebida: MetaDTO = req.body;
-
+        
             // instanciando um objeto do tipo meta com as informações recebidas
             const novaMeta = new Meta(
                 metaRecebida.nomeMeta,
@@ -94,6 +94,64 @@ export class MetaController extends Meta {
         }
     }
 
-    
-    
+    /**
+     * Método para atualizar o cadastro de uma meta.
+     * 
+     * @param req Objeto de requisição do Express, contendo os dados atualizados do cliente
+     * @param res Objeto de resposta do Express
+     * @returns Retorna uma resposta HTTP indicando sucesso ou falha na atualização
+     */
+    static async atualizar(req: Request, res: Response): Promise<any> {
+        try {
+            const dadosRecebidos: MetaDTO = req.body;
+            
+            // Cria uma nova instância de meta com os dados atualizados
+            const meta = new Meta(
+                dadosRecebidos.nomeMeta,
+                dadosRecebidos.dataInicial, 
+                dadosRecebidos.dataFinal,
+                dadosRecebidos.categorizacao,
+                dadosRecebidos.valor,
+            );
+
+            // Define o ID da meta, que deve ser passado na query string
+            meta.setIdMeta(parseInt(req.query.idMeta as string));    
+            
+            // Chama o método para atualizar o cadastro da meta no banco de dados
+            if (await Meta.atualizarMeta(meta)) {
+                return res.status(200).json({ mensagem: "Cadastro atualizado com sucesso!" });
+            } else {
+                return res.status(400).json('Não foi possível atualizar a meta no banco de dados');
+            }
+        } catch (error) {
+            // Caso ocorra algum erro, este é registrado nos logs do servidor
+            console.error(`Erro no modelo: ${error}`);
+            // Retorna uma resposta com uma mensagem de erro
+            return res.json({ mensagem: "Erro ao atualizar aluno." });
+        }
+    }
+
+     /**
+     * Remove uma meta.
+     * @param req Objeto de requisição HTTP com o ID da meta a ser removido.
+     * @param res Objeto de resposta HTTP.
+     * @returns Mensagem de sucesso ou erro em formato JSON.
+     */
+     static async remover(req: Request, res: Response): Promise<any> {
+        try {
+            const idMeta= parseInt(req.query.idMeta as string);
+            const result = await Meta.removerMeta(idMeta);
+            
+            if (result) {
+                return res.status(200).json('Meta removida com sucesso');
+            } else {
+                return res.status(401).json('Erro ao deletar meta');
+            }
+        } catch (error) {
+            console.log("Erro ao remover o meta");
+            console.log(error);
+            return res.status(500).send("error");
+        }
+    }
+
 }

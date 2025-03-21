@@ -21,6 +21,7 @@ export class Meta {
     private categorizacao: string;
     /* Valor da meta */
     private valor: number;
+    private statusMeta: boolean = true;
 
     /**
      * Construtor da classe Meta
@@ -153,6 +154,25 @@ export class Meta {
     }
 
     /**
+     * Retorna o status dam meta no sistema
+     * 
+     * @returns Status da meta no sistema
+     */
+    public getStatusMeta(): boolean {
+        return this.statusMeta;
+    }
+
+    /**
+     * Atribui o parâmetro ao atributo status livro
+     * 
+     * @param _statusMeta : Status do livro no sistema
+     */
+    public setStatusMeta(_statusMeta: boolean) {
+        this.statusMeta = _statusMeta;
+    }
+
+
+    /**
      * Busca e retorna uma lista de metas do banco de dados.
      * @returns Um array de objetos do tipo `Meta` em caso de sucesso ou `null` se ocorrer um erro durante a consulta.
      * 
@@ -167,7 +187,7 @@ export class Meta {
 
         try {
             // query de consulta ao banco de dados
-            const querySelectMeta = `SELECT * FROM meta;`;
+            const querySelectMeta = `SELECT * FROM meta WHERE status_meta = TRUE;`;
 
             // fazendo a consulta e guardando a resposta
             const respostaBD = await database.query(querySelectMeta);
@@ -185,6 +205,7 @@ export class Meta {
 
                 // atribui o ID objeto
                 novaMeta.setIdMeta(meta.id_meta);
+                novaMeta.setStatusMeta(meta.status_meta);
 
                 // adiciona o objeto na lista
                 listaDeMetas.push(novaMeta);
@@ -254,5 +275,86 @@ export class Meta {
             return false;
         }
     }
+
+
+    /**
+    * Atualiza os dados de um meta no banco de dados.
+    * @param meta Objeto do tipo meta com os novos dados
+    * @returns true caso sucesso, false caso erro
+    */
+    static async atualizarMeta(meta: Meta): Promise<Boolean> {
+        let queryResult = false; // Variável para armazenar o resultado da operação.
+        try {
+            // Construção da query SQL para atualizar os dados da meta no banco de dados.
+            const queryAtualizarMeta = `UPDATE meta SET 
+                                            nome_meta = '${meta.getNomeMeta().toUpperCase()}', 
+                                            data_inicial = '${meta.getDataInicial()}',
+                                            data_final = '${meta.getDataFinal()}', 
+                                            categorizacao = '${meta.getCategorizacao().toUpperCase()}',
+                                            valor = ${meta.getValor()}
+                                            WHERE id_meta = ${meta.idMeta}`;
+
+            // Executa a query de atualização e verifica se a operação foi bem-sucedida.
+            await database.query(queryAtualizarMeta)
+                .then((result) => {
+                    if (result.rowCount != 0) {
+                        queryResult = true; // Se a operação foi bem-sucedida, define queryResult como true.
+                    }
+                });
+
+            // Retorna o resultado da operação para quem chamou a função.
+            return queryResult;
+            // captura qualquer erro que possa acontecer
+        } catch (error) {
+            // exibe detalhes do erro no console
+            console.log(`Erro na consulta: ${error}`);
+            // retorna o valor da variável de controle
+            return queryResult;
+        }
+    }
+
+    /**
+   * Remove um meta do banco de dados
+   * @param idMeta ID da meta a ser removido
+   * @returns Boolean indicando se a remoção foi bem-sucedida
+  */
+    static async removerMeta(id_meta: number): Promise<Boolean> {
+        // variável de controle da execução da query
+        let queryResult = false;
+
+        try {
+            // Cria a consulta para remover meta do banco de dados
+            const queryDeleteMetaBanco = `UPDATE banco
+                                         SET status_banco = FALSE 
+                                         WHERE id_meta = ${id_meta}`;
+
+            // executa a query para remover empréstimo
+            await database.query(queryDeleteMetaBanco);
+
+            // Construção da query SQL para deletar a meta.
+            const queryDeleteMeta = `UPDATE meta
+                                        SET status_meta = FALSE 
+                                        WHERE id_meta = ${id_meta};`;
+
+            // Executa a query de exclusão e verifica se a operação foi bem-sucedida.
+            await database.query(queryDeleteMeta)
+                .then((result) => {
+                    if (result.rowCount != 0) {
+                        queryResult = true; // Se a operação foi bem-sucedida, define queryResult como true.
+                    }
+                });
+
+            // retorna o valor da variável de controle
+            return queryResult;
+
+            // captura qualquer erro que possa acontecer
+        } catch (error) {
+            // Exibe detalhes do erro no console
+            console.log(`Erro na consulta: ${error}`);
+            // retorna o valor fa variável de controle
+            return queryResult;
+        }
+    }
+
 
 }
