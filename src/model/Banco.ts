@@ -23,6 +23,8 @@ export class Banco {
     private transacao: number;
     /* Dívidas do banco */
     private dividas: number;
+     /*status de registro do banco*/
+    private statusBanco: boolean = true;
 
     /**
      * Construtor da classe Banco
@@ -175,6 +177,16 @@ export class Banco {
         this.dividas = dividas;
     }
 
+
+    public getStatusBanco(): boolean {
+        return this.statusBanco;
+    }
+
+    public setStatusBanco(_statusBanco: boolean) {
+        this.statusBanco = _statusBanco
+    }
+
+
     /**
      * Busca e retorna uma lista de bancos do banco de dados.
      * @returns Um array de objetos do tipo `Banco` em caso de sucesso ou `null` se ocorrer um erro durante a consulta.
@@ -190,7 +202,7 @@ export class Banco {
 
         try {
             // query de consulta ao banco de dados
-            const querySelectBanco = `SELECT * FROM banco;`;
+            const querySelectBanco = `SELECT * FROM banco WHERE status_banco = TRUE;`;
 
             // fazendo a consulta e guardando a resposta
             const respostaBD = await database.query(querySelectBanco);
@@ -254,6 +266,93 @@ export class Banco {
             console.log('Erro ao cadastrar o banco. Verifique os logs para mais detalhes.');
             console.log(error);
             // retorna valor falso em caso de falha
+            return false;
+        }
+    }
+
+    /**
+    * Atualiza os dados de um banco existente no banco de dados
+    * 
+    * @param idBanco : number
+    * @param idCliente : number'
+    * @param idMeta : number
+    * @param nomeBanco : string
+    * @param saldo : number
+    * @param transacao: number
+    * @param dividas : number
+    * @param statusBanco : boolean
+    * @returns Promise com o resultado da atualização ou erro
+    */
+    static async atualizarBanco(
+        idBanco: number,
+        idCliente: number,
+        idMeta: number,
+        nomeBanco: string,
+        saldo: number,
+        transacao: number,
+        dividas: number
+    ): Promise<any> {
+        try {
+            // Cria a consulta (query) para atualizar um banco
+            const queryUpdateBanco = `UPDATE Banco
+            SET id_cliente = $1, id_meta = $2, nome_banco = $3, saldo = $4, transacao = $5, dividas = $6
+            WHERE id_banco = $7
+            RETURNING id_banco;`;
+
+            // estrutura os valores recebidos pela função em uma lista (array)
+            const valores = [idCliente, idMeta, nomeBanco, saldo, transacao, dividas, idBanco];
+            // executa a consulta e armazena o resultado
+            const resultado = await database.query(queryUpdateBanco, valores);
+
+            // verifica se o empréstimo não existe
+            if (resultado.rowCount === 0) {
+                // lança um novo erro
+                throw new Error('Banco não encontrado.');
+            }
+
+            return resultado.rows[0].id_banco; // Retorna o ID do banco atualizado
+            // captura qualquer erro que possa acontecer
+        } catch (error) {
+            // exibe detalhes do erro no console
+            console.error(`Erro ao atualizar banco: ${error}`);
+            // lança um novo erro
+            throw new Error('Erro ao atualizar o banco.');
+        }
+    }
+
+    static async removerBanco(idBanco: number): Promise<any> {
+        try {
+
+            console.log("ID recebido para remoção:", idBanco);
+            if (!idBanco || isNaN(idBanco)) {
+                console.error("Erro: ID do banco inválido!");
+                return false;
+            }
+            //cria uma query para deletar um objeto do banco de dados, passando como parametro o id do banco recebido na função
+            const queryUpdateBanco = ` UPDATE banco
+                                            SET status_banco = FALSE
+                                            WHERE id_banco = ${idBanco}`;
+
+            //executar a query e armazenar a resposta do BD
+            const respostaBD = await database.query(queryUpdateBanco);
+
+            //verifica se a quantidade de linhas modificadas é diferente de 0
+            if (respostaBD.rowCount != 0) {
+                console.log(`Banco removido com sucesso! ID do banco: ${idBanco}`);
+                //true significa que a remoção foi bem sucedida
+                return true;
+            }
+            //false, o que indica que a remoção não foi bem sucedida
+            return false;
+
+
+            //trata qualquer erro que possa acontecer no caminho
+        } catch (error) {
+            //exibe uma mensagem de erro
+            console.log(`Erro ao remover o banco. Verifique os logs para mais detalhes.`)
+            //imprime o erro no console da API
+            console.log(error);
+            //retorna false, o que indica a remoção não foi feita
             return false;
         }
     }

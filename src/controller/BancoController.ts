@@ -90,6 +90,60 @@ export class BancoController extends Banco {
         }
     }
 
+
+    /**
+     * Atualiza um banco existente.
+     * Recebe os dados do banco a partir da requisição e passa para o serviço.
+     */
+    static async atualizar(req: Request, res: Response): Promise<any> {
+        try {
+            const dadosRecebidos: BancoDTO = req.body;
+            const idBanco = parseInt(req.query.idBanco as string);
+            
+            // Verifica se todos os campos obrigatórios foram fornecidos
+            if (!idBanco || !dadosRecebidos.idCliente || !dadosRecebidos.idMeta || !dadosRecebidos.nomeBanco || !dadosRecebidos.saldo || !dadosRecebidos.transacao || !dadosRecebidos.dividas) {
+                return res.status(400).json({ message: 'Todos os campos são obrigatórios.' });
+            }
+
+            // Chama o MODEL para atualizar o banco/ Number(idBanco) converte o idBanco de string para number
+                const bancoAtualizado = await Banco.atualizarBanco(
+                idBanco, dadosRecebidos.idCliente, dadosRecebidos.idMeta, dadosRecebidos.nomeBanco, dadosRecebidos.saldo, dadosRecebidos.transacao, dadosRecebidos.dividas
+            );
+
+            // Retorna a resposta de sucesso com o ID do banco atualizado
+            return res.status(200).json({ message: 'Banco atualizado com sucesso', idBanco: bancoAtualizado });
+
+        } catch (error) {
+            console.error('Erro ao atualizar o banco:', error);
+            return res.status(500).json({ message: 'Erro ao atualizar o banco.' });
+        }
+    }
+
+    static async remover(req: Request, res: Response): Promise<any> {
+        try {
+            // recuperando o id do banco que será removido
+            const idBanco = parseInt(req.query.idBanco as string);
+
+            // chamando a função de remoção do banco
+            const respostaModelo = await Banco.removerBanco(idBanco);
+            
+            // verificando a resposta da função
+            if (respostaModelo) {
+                // retornar uma mensagem de sucesso
+                return res.status(200).json({ mensagem: "Banco removido com sucesso!" });
+            } else {
+                // retorno uma mensagem de erro
+                return res.status(400).json({ mensagem: "Erro ao remover o banco. Entre em contato com o administrador do sistema." })
+            }
+        } catch (error) {
+            // lança uma mensagem de erro no console
+            console.log(`Erro ao remover um banco. ${error}`);
+
+            // retorna uma mensagem de erro há quem chamou a mensagem
+            return res.status(400).json({ mensagem: "Não foi possível remover o banco. Entre em contato com o administrador do sistema." });
+        }
+    }
+
 }
 
 

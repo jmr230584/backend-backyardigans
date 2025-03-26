@@ -25,7 +25,6 @@ router.put("/atualizar/cliente", ClienteController.atualizar);
 */ 
 //Rota para listar as metas
 router.get("/lista/metas", MetaController.lista);
-// Rota para adicionar meta
 router.post("/nova/meta", MetaController.nova);
 router.put("/atualizar/meta", MetaController.atualizar);
 router.put("/remover/meta", MetaController.remover);
@@ -35,6 +34,8 @@ router.put("/remover/meta", MetaController.remover);
 */ 
 router.get("/lista/bancos", BancoController.lista);
 router.post("/novo/bancos", BancoController.novo);
+router.put("/atualizar/banco", BancoController.atualizar);
+router.put("/remover/banco", BancoController.remover);
 
 
 export { router };
