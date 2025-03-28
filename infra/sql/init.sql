@@ -21,9 +21,9 @@ CREATE TABLE banco(
     id_cliente INT NOT NULL,
     id_meta INT NOT NULL,
     nome_banco VARCHAR(100) NOT NULL,
-    saldo DECIMAL(10,2) NOT NULL,
-    transacao DECIMAL(10,2) NOT NULL,
-    dividas DECIMAL(10,2) NOT NULL,
+    saldo DECIMAL(10,2),
+    transacao DECIMAL(10,2),
+    dividas DECIMAL(10,2),
     FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente),
     FOREIGN KEY (id_meta) REFERENCES meta(id_meta)
 );
@@ -54,3 +54,4 @@ INSERT INTO banco (id_cliente, id_meta, nome_banco, saldo, transacao, dividas) V
 (3, 3, 'Banco Capitol', 15000.00, 2500.00, 1200.00),
 (4, 4, 'Banco Dauntless', 11000.00, 1800.00, 700.00),
 (5, 5, 'Banco Glade', 13000.00, 2200.00, 1000.00);
+
