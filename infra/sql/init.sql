@@ -54,4 +54,3 @@ INSERT INTO banco (id_cliente, id_meta, nome_banco, saldo, transacao, dividas) V
 (3, 3, 'Banco Capitol', 15000.00, 2500.00, 1200.00),
 (4, 4, 'Banco Dauntless', 11000.00, 1800.00, 700.00),
 (5, 5, 'Banco Glade', 13000.00, 2200.00, 1000.00);
-

@@ -70,6 +70,8 @@ export class ClienteController extends Cliente {
                 clienteRecebido.email,
                 clienteRecebido.senha);
 
+                console.log(clienteRecebido.dataNascimento);
+
             // Chama a função de cadastro passando o objeto como parâmetro
             const repostaClasse = await Cliente.cadastroCliente(novoCliente);
 
