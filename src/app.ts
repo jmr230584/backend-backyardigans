@@ -1,9 +1,9 @@
 import { server } from './server';
-import { DatabaseModel } from './model/DatabaseModel';
+import { DataBaseModel } from './model/DataBaseModel';
 
 const port: number = 3333;
 
-new DatabaseModel().testeConexao().then((resbd) => {
+new DataBaseModel().testeConexao().then((resbd) => {
     if(resbd) {
         server.listen(port, () => {
             console.log(`Aplicação on-line em http://localhost:${port}`);

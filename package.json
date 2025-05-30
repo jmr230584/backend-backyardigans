@@ -2,6 +2,8 @@
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/multer": "^1.4.12",
     "@types/node": "^22.13.5",
     "@types/pg": "^8.11.11",
     "nodemon": "^3.1.9",
@@ -18,13 +20,15 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "Ana Assis, Ana Naves, Pedro Alves, Tiago Filho, Yuri Silva",
+  "author": "Ana Naves, Pedro Alves, Murilo, Yuri Silva",
   "license": "ISC",
   "description": "",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.0",
     "pg": "^8.13.2"
   }
 }

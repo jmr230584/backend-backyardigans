@@ -6,7 +6,7 @@ dotenv.config();
 /**
  * Classe que representa o modelo de banco de dados.
  */
-export class DatabaseModel {
+export class DataBaseModel {
     
     /**
      * Configuração para conexão com o banco de dados
@@ -54,13 +54,13 @@ export class DatabaseModel {
         try {
             // Tenta conectar ao banco de dados
             await this._client.connect();
-            console.log('Conexão com banco realizada com sucesso!');
+            console.log('Database connected!');
             // Encerra a conexão
             this._client.end();
             return true;
         } catch (error) {
             // Em caso de erro, exibe uma mensagem de erro
-            console.log('Erro ao se conectar com o banco de dados X( ');
+            console.log('Error to connect database X( ');
             console.log(error);
             // Encerra a conexão
             this._client.end();

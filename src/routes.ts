@@ -1,41 +1,38 @@
-import { Request, Response, Router } from "express";
-import { ClienteController } from "./controller/ClienteController";
-import { MetaController } from "./controller/MetaController";
-import { BancoController } from "./controller/BancoController";
+import express from "express";
+import { SERVER_ROUTES } from "./appConfig";
+import {ClienteController} from "./controller/ClienteController";
+import {MetaController} from "./controller/MetaController";
+import {BancoController} from "./controller/BancoController";
+import UsuarioController from "./controller/UsuarioController";
+import  {upload} from "./config/multerConfig" // caminho pode variar dependendo da estrutura
+import { Auth } from './auth/Auth';
 
-//Cria um roteador
-const router = Router();
+const router = express.Router();
 
-//Criando uma rota principal para a aplicação
-router.get("/", (req: Request, res: Response)=> {
-    res.json({ mensagem: "Olá, Mundo!"});
+router.get('/', (req, res) => {
+    res.json({ mensagem: "Rota padrão" })
 });
 
-/* 
-* ROTAS PARA CLIENTE
-*/ 
-router.get("/lista/clientes", ClienteController.lista);
-router.post("/novo/cliente", ClienteController.novo);
-router.put("/remover/cliente", ClienteController.remover);
-router.put("/atualizar/cliente", ClienteController.atualizar);
+// CRUD Cliente
+router.get(SERVER_ROUTES.LISTAR_CLIENTES, ClienteController.lista);
+router.post(SERVER_ROUTES.NOVO_CLIENTE, ClienteController.novo);
+router.put(SERVER_ROUTES.REMOVER_CLIENTE, ClienteController.remover);
+router.put(SERVER_ROUTES.ATUALIZAR_CLIENTE, ClienteController.atualizar);
 
+//CRUD Meta
+router.get(SERVER_ROUTES.LISTAR_METAS, MetaController.lista);
+router.post(SERVER_ROUTES.NOVA_META, MetaController.novo);
+router.put(SERVER_ROUTES.REMOVER_META, MetaController.remover);
+router.put(SERVER_ROUTES.ATUALIZAR_META, MetaController.atualizar);
 
-/* 
-* ROTAS PARA META
-*/ 
-//Rota para listar as metas
-router.get("/lista/metas", MetaController.lista);
-router.post("/nova/meta", MetaController.nova);
-router.put("/atualizar/meta", MetaController.atualizar);
-router.put("/remover/meta", MetaController.remover);
+//CRUD Banco
+router.get(SERVER_ROUTES.LISTAR_BANCOS, BancoController.lista);
+router.post(SERVER_ROUTES.NOVO_BANCO, BancoController.novo);
+router.put(SERVER_ROUTES.ATUALIZAR_BANCO, BancoController.atualizar);
+router.put(SERVER_ROUTES.REMOVER_BANCO, BancoController.remover);
 
-/* 
-* ROTAS PARA BANCO
-*/ 
-router.get("/lista/bancos", BancoController.lista);
-router.post("/novo/bancos", BancoController.novo);
-router.put("/atualizar/banco", BancoController.atualizar);
-router.put("/remover/banco", BancoController.remover);
+// Cadastro de Usuário com Upload de Imagem de Perfil
+router.post(SERVER_ROUTES.NOVO_USUARIO, upload.single('imagemPerfil'), UsuarioController.cadastrar);
+router.post('/login', Auth.validacaoUsuario);
 
-
-export { router };
+export { router }

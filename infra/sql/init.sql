@@ -54,3 +54,52 @@ INSERT INTO banco (id_cliente, id_meta, nome_banco, saldo, transacao, dividas) V
 (3, 3, 'Banco Capitol', 15000.00, 2500.00, 1200.00),
 (4, 4, 'Banco Dauntless', 11000.00, 1800.00, 700.00),
 (5, 5, 'Banco Glade', 13000.00, 2200.00, 1000.00);
+
+
+-- CREATE USUARIOS
+CREATE TABLE IF NOT EXISTS Usuario (
+    id_usuario SERIAL PRIMARY KEY,
+    uuid UUID DEFAULT gen_random_uuid() NOT NULL,
+    nome VARCHAR(70) NOT NULL,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(50) UNIQUE NOT NULL,
+    senha VARCHAR(50) NOT NULL
+);
+
+-- Criar a função gerar_senha_padrao apenas se não existir
+CREATE OR REPLACE FUNCTION gerar_senha_padrao()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.senha := NEW.username || '1234';
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Criar a trigger trigger_gerar_senha apenas se não existir
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trigger_gerar_senha') THEN
+        CREATE TRIGGER trigger_gerar_senha
+        BEFORE INSERT ON Usuario
+        FOR EACH ROW
+        EXECUTE FUNCTION gerar_senha_padrao();
+    END IF;
+END $$;
+
+SELECT * FROM usuario
+
+
+INSERT INTO usuario (nome, username, email) 
+VALUES
+('João Silva', 'joao.silva', 'joao.silva@email.com'),
+('Maria Oliveira', 'maria.oliveira', 'maria.oliveira@email.com'),
+('Carlos Souza', 'carlos.souza', 'carlos.souza@email.com');
+
+
+
+ALTER TABLE usuario
+ADD COLUMN status_usuario BOOLEAN DEFAULT true;
+
+UPDATE usuario SET senha = encode(digest(senha, 'sha1'), 'hex');
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
