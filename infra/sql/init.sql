@@ -103,3 +103,7 @@ ADD COLUMN status_usuario BOOLEAN DEFAULT true;
 UPDATE usuario SET senha = encode(digest(senha, 'sha1'), 'hex');
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+ALTER TABLE usuario ADD COLUMN imagem_perfil VARCHAR(100);
+
+
