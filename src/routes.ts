@@ -27,6 +27,7 @@ router.put(SERVER_ROUTES.ATUALIZAR_META, MetaController.atualizar);
 
 //CRUD Banco
 router.get(SERVER_ROUTES.LISTAR_BANCOS, BancoController.lista);
+router.get("/lista/bancos/:idCliente", BancoController.listarBancosPorCliente);
 router.post(SERVER_ROUTES.NOVO_BANCO, BancoController.novo);
 router.put(SERVER_ROUTES.ATUALIZAR_BANCO, BancoController.atualizar);
 router.put(SERVER_ROUTES.REMOVER_BANCO, BancoController.remover);

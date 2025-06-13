@@ -320,6 +320,53 @@ export class Banco {
         }
     }
 
+        /**
+     * Lista todos os bancos associados a um cliente específico.
+     * 
+     * @param idCliente - O identificador do cliente
+     * @returns Um array de objetos Banco ou null se ocorrer erro
+     */
+        static async listarBancosPorCliente(idCliente: number): Promise<Array<Banco> | null> {
+            const listaDeBancos: Array<Banco> = [];
+    
+            try {
+                // Query que filtra os bancos pelo id do cliente e status ativo
+                const query = `SELECT * FROM banco WHERE id_cliente = $1 AND status_banco = TRUE;`;
+    
+                // Executa a query
+                const respostaBD = await database.query(query, [idCliente]);
+    
+                // Itera sobre as linhas retornadas
+                respostaBD.rows.forEach((linha: {
+                    id_cliente: number;
+                    id_meta: number;
+                    nome_banco: string;
+                    saldo: number;
+                    transacao: number;
+                    dividas: number;
+                    id_banco: number;
+                }) => {
+                    const banco = new Banco(
+                        linha.id_cliente,
+                        linha.id_meta,
+                        linha.nome_banco,
+                        linha.saldo,
+                        linha.transacao,
+                        linha.dividas
+                    );
+                    banco.setIdBanco(linha.id_banco);
+                    listaDeBancos.push(banco);
+                });
+    
+                return listaDeBancos;
+            } catch (error) {
+                console.error("Erro ao listar bancos por cliente:", error);
+                return null;
+            }
+        }
+    
+    
+
     static async removerBanco(idBanco: number): Promise<any> {
         try {
 

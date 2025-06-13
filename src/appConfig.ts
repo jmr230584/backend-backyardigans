@@ -11,7 +11,7 @@ const SERVER_ROUTES = {
 
     NOVO_BANCO: '/novo/emprestimo',
     ATUALIZAR_BANCO: '/atualiza/emprestimo',
-    LISTAR_BANCOS: '/lista/emprestimos',
+    LISTAR_BANCOS: '/lista/bancos',
     REMOVER_BANCO: '/remove/emprestimo',
 
     NOVO_USUARIO: '/novo/usuario',
