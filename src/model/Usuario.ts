@@ -1,4 +1,5 @@
 import { DataBaseModel } from "./DataBaseModel";
+import bcrypt from 'bcrypt';
 
 // Recupera conexão com o banco de dados
 const database = new DataBaseModel().pool;
@@ -124,10 +125,10 @@ export class Usuario {
      * Atribui um valor à senha do usuário
      * @param senha Senha do usuário
      */
-    public setSenha(senha: string): void {
-        this.senha = senha;
+    public async setSenha(senha: string): Promise<void> {
+        const saltRounds = 10;
+        this.senha = await bcrypt.hash(senha, saltRounds);
     }
-
     /**
      * Retorna a o caminho da imagem do usuario
      * @returns caminho da imagem do usuário
@@ -193,37 +194,35 @@ export class Usuario {
      */
     static async cadastroUsuario(usuario: Usuario): Promise<string | null> {
         try {
-            // Define a query SQL para inserir um novo usuário com nome, username, email e senha
-            // A cláusula RETURNING uuid retorna o identificador gerado automaticamente pelo banco
             const query = `
-          INSERT INTO usuario (nome, username, email, senha)
-          VALUES ($1, $2, $3, $4)
-          RETURNING uuid
-        `;
-
-            // Define os valores que serão usados na query (evita SQL Injection)
-            const valores = [usuario.nome, usuario.username, usuario.email, usuario.senha];
-
-            // Executa a query no banco de dados e aguarda a resposta
+              INSERT INTO usuario (nome, username, email, senha)
+              VALUES ($1, $2, $3, $4)
+              RETURNING uuid
+            `;
+    
+            const valores = [
+                usuario.getNome(),
+                usuario.getUsername(),
+                usuario.getEmail(),
+                usuario.getSenha() // ← já está criptografada
+            ];
+    
             const resultado = await database.query(query, valores);
-
-            // Obtém o uuid gerado pelo banco de dados a partir do resultado da query
             const uuid = resultado.rows[0].uuid;
-
-            // Atribui o uuid ao objeto do usuário, caso precise ser usado depois
-            usuario.uuidUsuario = uuid;
-
-            // Retorna o uuid como confirmação do cadastro
+    
+            usuario.setUuidUsuario(uuid);
+    
             return uuid;
         } catch (error) {
-            // Em caso de erro, exibe no console para ajudar na identificação do problema
             console.error('Erro ao salvar usuário:', error);
-
-            // Retorna null para indicar que o cadastro não foi concluído
             return null;
         }
     }
-
+    
+    
+    
+    
+    
     /**
      * Atualiza o caminho da imagem de perfil no cadastro do usuário
      * @param uuid UUID do usuário, que representará o nome da imagem

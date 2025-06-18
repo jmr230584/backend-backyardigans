@@ -35,7 +35,7 @@ class UsuarioController extends Usuario {
                 dadosRecebidos.username,
                 dadosRecebidos.email
             );
-            novoUsuario.setSenha(dadosRecebidos.senha);
+            await novoUsuario.setSenha(dadosRecebidos.senha);
     
             const uuid = await Usuario.cadastroUsuario(novoUsuario);
             if (!uuid) {
