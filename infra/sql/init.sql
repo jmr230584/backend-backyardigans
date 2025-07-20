@@ -110,4 +110,7 @@ ALTER TABLE usuario ADD COLUMN imagem_perfil VARCHAR(100);
 ALTER TABLE usuario
 ALTER COLUMN senha TYPE VARCHAR(255);
 
+DROP TRIGGER IF EXISTS trigger_gerar_senha ON usuario;
+DROP FUNCTION IF EXISTS gerar_senha_padrao;
+
 
