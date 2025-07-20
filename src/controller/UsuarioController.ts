@@ -2,6 +2,10 @@ import { Usuario } from '../model/Usuario'; // modelo do usuário
 import { Request, Response } from "express"; // Request e Response do express
 import fs from 'fs'; // Importa o módulo fs para manipulação de arquivos (file system)
 import path from 'path';  // Importa o módulo path para lidar com caminhos de arquivos e diretórios
+import bcrypt from 'bcrypt';
+import { DataBaseModel } from '../model/DataBaseModel';
+
+const database = new DataBaseModel().pool;
 
 /**
  * Interface UsuarioDTO
@@ -28,37 +32,34 @@ class UsuarioController extends Usuario {
      * @returns Mensagem de sucesso ou erro em formato JSON.
      */
     static async cadastrar(req: Request, res: Response) {
-        try {
-            const dadosRecebidos: UsuarioDTO = req.body;
-            const novoUsuario = new Usuario(
-                dadosRecebidos.nome,
-                dadosRecebidos.username,
-                dadosRecebidos.email
-            );
-            await novoUsuario.setSenha(dadosRecebidos.senha);
-    
-            const uuid = await Usuario.cadastroUsuario(novoUsuario);
-            if (!uuid) {
-                res.status(500).json({ erro: 'Erro ao cadastrar usuário' });
-                return;
-            }
-    
-            if (req.file) {
-                const ext = path.extname(req.file.originalname);
-                const novoNome = `${uuid}${ext}`;
-                const antigoPath = req.file.path;
-                const novoPath = path.resolve(req.file.destination, novoNome);
-    
-                fs.renameSync(antigoPath, novoPath);
-                await Usuario.atualizarImagemPerfil(uuid, novoNome);
-            }
-    
-            res.status(201).json({ mensagem: 'Usuário cadastrado com sucesso' });
-        } catch (error) {
-            console.error('Erro ao cadastrar usuário:', error);
-            res.status(500).json({ erro: 'Erro ao cadastrar usuário', detalhes: error });
-        }
+    const { nome, username, email, senha } = req.body;
+    const imagemPerfil = req.file?.filename;
+
+    try {
+        const query = `
+            INSERT INTO usuario (nome, username, email, senha, imagem_perfil)
+            VALUES ($1, $2, $3, $4, $5)
+            RETURNING *;
+        `;
+
+        const senhaCriptografada = await bcrypt.hash(senha, 10); // 🔒 bcrypt aqui
+
+        const result = await database.query(query, [
+            nome,
+            username,
+            email,
+            senhaCriptografada, // usar o hash
+            imagemPerfil
+        ]);
+
+        res.status(201).json({ message: 'Usuário cadastrado com sucesso', usuario: result.rows[0] });
+
+    } catch (error) {
+        console.error("Erro ao cadastrar usuário:", error);
+        res.status(500).json({ message: 'Erro interno ao cadastrar usuário' });
     }
+}
+
 }
 
 export default UsuarioController;

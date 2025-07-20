@@ -21,6 +21,8 @@ interface JwtPayload {
     exp: number;
 }
 
+
+
 /**
  * Gera e trata um token de autenticação para o sistema
  */
@@ -34,47 +36,47 @@ export class Auth {
      */
     static async validacaoUsuario(req: Request, res: Response): Promise<any> {
         const { email, senha } = req.body;
-    
+
         const querySelectUser = `
             SELECT uuid, nome, email, senha, username 
             FROM usuario 
             WHERE LOWER(email) = LOWER($1) AND status_usuario = TRUE;
         `;
-    
+
         try {
             const queryResult = await database.query(querySelectUser, [email]);
-    
+
             // Se nenhum usuário foi encontrado
             if (queryResult.rowCount === 0) {
                 return res.status(401).json({ auth: false, token: null, message: "Usuário e/ou senha incorretos" });
             }
-    
+
             const usuarioBanco = queryResult.rows[0];
-    
+
             // Compara a senha digitada com a senha criptografada no banco
             const senhaValida = await bcrypt.compare(senha, usuarioBanco.senha);
-    
+
             if (!senhaValida) {
                 return res.status(401).json({ auth: false, token: null, message: "Usuário e/ou senha incorretos" });
             }
-    
+
             const usuario = {
                 uuid: usuarioBanco.uuid,
                 nome: usuarioBanco.nome,
                 email: usuarioBanco.email,
                 username: usuarioBanco.username
             };
-    
+
             const tokenUsuario = Auth.generateToken(parseInt(usuario.uuid), usuario.nome, usuario.username);
-    
+
             return res.status(200).json({ auth: true, token: tokenUsuario, usuario: usuario });
-    
+
         } catch (error) {
             console.log(`Erro no modelo: ${error}`);
             return res.status(500).json({ message: "Erro interno do servidor" });
         }
     }
-    
+
 
 
     /**
@@ -153,4 +155,30 @@ export class Auth {
             next();
         });
     }
+
+    /**
+ * Atualiza todas as senhas dos usuários para bcrypt
+ * 
+ */
+    static async atualizarSenhasComBcrypt(req: Request, res: Response): Promise<any> {
+        const querySelect = `SELECT id_usuario, senha FROM usuario WHERE status_usuario = TRUE;`;
+        const queryUpdate = `UPDATE usuario SET senha = $1 WHERE id_usuario = $2;`;
+
+        try {
+            const { rows } = await database.query(querySelect);
+
+            for (const usuario of rows) {
+                // Gera o hash da senha atual
+                const senhaCriptografada = await bcrypt.hash(usuario.senha, 10);
+                await database.query(queryUpdate, [senhaCriptografada, usuario.id_usuario]);
+            }
+
+            return res.status(200).json({ message: "Todas as senhas foram atualizadas com bcrypt com sucesso!" });
+
+        } catch (error) {
+            console.error("Erro ao atualizar senhas:", error);
+            return res.status(500).json({ message: "Erro ao atualizar senhas no banco de dados." });
+        }
+    }
+
 }
