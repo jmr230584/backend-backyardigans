@@ -1,4 +1,4 @@
-import { DataBaseModel } from "./DataBaseModel";
+import { DataBaseModel } from "./DatabaseModel";
 import bcrypt from 'bcrypt';
 
 // Recupera conexão com o banco de dados

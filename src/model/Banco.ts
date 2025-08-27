@@ -1,4 +1,4 @@
-import { DataBaseModel } from "./DataBaseModel";
+import { DataBaseModel } from "./DatabaseModel";
 
 // armazenei o pool de conexões
 const database = new DataBaseModel().pool;

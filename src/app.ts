@@ -1,5 +1,5 @@
 import { server } from './server';
-import { DataBaseModel } from './model/DataBaseModel';
+import { DataBaseModel } from './model/DatabaseModel';
 
 const port: number = 3333;
 
