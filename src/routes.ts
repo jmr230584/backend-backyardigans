@@ -5,7 +5,8 @@ import {MetaController} from "./controller/MetaController";
 import {BancoController} from "./controller/BancoController";
 import UsuarioController from "./controller/UsuarioController";
 import  {upload} from "./config/multerConfig" // caminho pode variar dependendo da estrutura
-import { Auth } from './auth/Auth';
+import { Auth } from './auth/Auth'; 
+
 
 const router = express.Router();
 
@@ -36,6 +37,15 @@ router.put(SERVER_ROUTES.REMOVER_BANCO, BancoController.remover);
 router.post(SERVER_ROUTES.NOVO_USUARIO, upload.single('imagemPerfil'), UsuarioController.cadastrar);
 router.post('/login', Auth.validacaoUsuario);
 //atualizar para bycript
-router.post('/atualizar-senhas', Auth.atualizarSenhasComBcrypt);
+router.get("/profile", Auth.verifyToken, (req, res) => {
+    res.status(200).json({
+        user: {
+            id: req.body.userId,
+            nome: req.body.nome,
+            username: req.body.username
+        }
+    });
+});
+
 
 export { router }
