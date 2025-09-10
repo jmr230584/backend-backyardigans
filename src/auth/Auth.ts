@@ -14,7 +14,7 @@ const database = new DataBaseModel().pool;
  * Interface para representar um Payload do JWT
  */
 interface JwtPayload {
-    id: number;
+    id: string;
     nome: string;
     username: string;
     exp: number;
@@ -59,14 +59,15 @@ export class Auth {
                 username: usuarioBanco.username
             };
 
-            const tokenUsuario = Auth.generateToken(parseInt(usuario.uuid), usuario.nome, usuario.username);
+            const tokenUsuario = Auth.generateToken(usuarioBanco.uuid, usuario.nome, usuario.username);
+
 
             // 🔑 Envia token no cookie HttpOnly
             res.cookie("token", tokenUsuario, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === "production", // true se estiver em HTTPS
-                sameSite: "strict",
-                maxAge: 1000 * 60 * 60 // 1 hora
+                secure: true,     
+                sameSite: "lax",    // ou "strict" se for mesma porta
+                maxAge: 1000 * 60 * 60 // 1h
             });
 
             return res.status(200).json({ auth: true, usuario });
@@ -80,47 +81,48 @@ export class Auth {
     /**
      * Gera token JWT
      */
-    static generateToken(id: number, nome: string, username: string) {
-        return jwt.sign({ id, nome, username }, SECRET, { expiresIn: '1h' });
+    static generateToken(id: string, nome: string, username: string) {
+        return jwt.sign({ id, nome, username }, SECRET, { expiresIn: "1h" });
     }
+
 
     /**
      * Verifica token do cookie
      */
     static verifyToken(req: Request, res: Response, next: NextFunction): void {
-    const token = req.cookies?.token;
+        const token = req.cookies?.token;
 
-    if (!token) {
-        res.status(401).json({ message: "Token não informado", auth: false });
-        return;
-    }
+        if (!token) {
+            res.status(401).json({ message: "Token não informado", auth: false });
+            return;
+        }
 
-    try {
-        const decoded = jwt.verify(token, SECRET) as JwtPayload;
+        try {
+            const decoded = jwt.verify(token, SECRET) as JwtPayload;
 
-        const { exp, id, nome, username } = decoded;
+            const { exp, id, nome, username } = decoded;
 
-        if (!exp || !id) {
+            if (!exp || !id) {
+                res.status(401).json({ message: "Token inválido, faça login", auth: false });
+                return;
+            }
+
+            const currentTime = Math.floor(Date.now() / 1000);
+            if (currentTime > exp) {
+                res.status(401).json({ message: "Token expirado, faça login novamente", auth: false });
+                return;
+            }
+
+            req.body.userId = id;
+            req.body.nome = nome;
+            req.body.username = username;
+
+            next();
+        } catch (err) {
             res.status(401).json({ message: "Token inválido, faça login", auth: false });
             return;
         }
-
-        const currentTime = Math.floor(Date.now() / 1000);
-        if (currentTime > exp) {
-            res.status(401).json({ message: "Token expirado, faça login novamente", auth: false });
-            return;
-        }
-
-        req.body.userId = id;
-        req.body.nome = nome;
-        req.body.username = username;
-
-        next();
-    } catch (err) {
-        res.status(401).json({ message: "Token inválido, faça login", auth: false });
-        return;
     }
-}
 
     /**
      * Logout - limpa cookie
