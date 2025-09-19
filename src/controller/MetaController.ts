@@ -16,9 +16,7 @@ interface MetaDTO {
  * - Herdando de `Meta`, ela pode acessar métodos e propriedades da classe base.
  */
 export class MetaController extends Meta {
-    static novo(arg0: string, novo: any) {
-        throw new Error("Method not implemented.");
-    }
+    
 
     /**
     * Lista todas as metas.

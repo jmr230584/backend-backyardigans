@@ -1,7 +1,7 @@
 // imports
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
-import { DataBaseModel } from '../model/DataBaseModel';
+import { DataBaseModel } from '../model/DatabaseModel';
 import bcrypt from 'bcrypt';
 
 

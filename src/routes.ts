@@ -21,7 +21,7 @@ router.put(SERVER_ROUTES.ATUALIZAR_CLIENTE, ClienteController.atualizar);
 
 //CRUD Meta
 router.get(SERVER_ROUTES.LISTAR_METAS, MetaController.lista);
-router.post(SERVER_ROUTES.NOVA_META, MetaController.novo);
+router.post(SERVER_ROUTES.NOVA_META, MetaController.nova);
 router.put(SERVER_ROUTES.REMOVER_META, MetaController.remover);
 router.put(SERVER_ROUTES.ATUALIZAR_META, MetaController.atualizar);
 
