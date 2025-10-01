@@ -65,8 +65,8 @@ export class Auth {
             // 🔑 Envia token no cookie HttpOnly
             res.cookie("token", tokenUsuario, {
                 httpOnly: true,
-                secure: true,     
-                sameSite: "lax",    // ou "strict" se for mesma porta
+                secure: process.env.NODE_ENV === "production", // só força secure em produção
+                sameSite: "strict", // use o mesmo aqui e no logout
                 maxAge: 1000 * 60 * 60 // 1h
             });
 
@@ -128,12 +128,14 @@ export class Auth {
      * Logout - limpa cookie
      */
     static logout(req: Request, res: Response) {
+        // Logout
         res.clearCookie("token", {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "strict"
         });
         return res.status(200).json({ message: "Logout realizado com sucesso" });
+
     }
 
     /**
