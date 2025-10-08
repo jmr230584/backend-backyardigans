@@ -12,7 +12,7 @@ const SERVER_ROUTES = {
     NOVO_BANCO: '/novo/emprestimo',
     ATUALIZAR_BANCO: '/atualiza/emprestimo',
     LISTAR_BANCOS: '/lista/bancos',
-    REMOVER_BANCO: '/remove/emprestimo',
+    REMOVER_BANCO: '/remove/banco',
 
     NOVO_USUARIO: '/novo/usuario',
 }
