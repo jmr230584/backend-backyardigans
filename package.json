@@ -1,15 +1,15 @@
 {
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
-    "@types/cors": "^2.8.17",
-    "@types/express": "^5.0.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.5",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/multer": "^1.4.12",
-    "@types/node": "^22.13.5",
+    "@types/node": "^22.18.13",
     "@types/pg": "^8.11.11",
-    "nodemon": "^3.1.9",
+    "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.3"
+    "typescript": "^5.9.3"
   },
   "name": "backend-backyardigans",
   "version": "1.0.0",
@@ -33,5 +33,13 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.0",
     "pg": "^8.16.3"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jmr230584/backend-backyardigans.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jmr230584/backend-backyardigans/issues"
+  },
+  "homepage": "https://github.com/jmr230584/backend-backyardigans#readme"
 }

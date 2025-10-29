@@ -11,45 +11,35 @@ export class Banco {
     /* Atributos */
     /* Identificador do banco */
     private idBanco: number = 0;
-    /* Identificador do cliente */
-    private idCliente: number;
-    /* Identificador da meta */
-    private idMeta: number;
     /* Nome do banco */
     private nomeBanco: string;
-    /* Saldo do banco */
-    private saldo: number;
-    /* Transação do banco */
-    private transacao: number;
-    /* Dívidas do banco */
-    private dividas: number;
+    /* tipo do banco */
+    private tipoBanco: string;
+    /* meta vinculada */
+    private metaVinculada: string;
+    /* entrada */
+    private entrada: number;
      /*status de registro do banco*/
     private statusBanco: boolean = true;
 
     /**
      * Construtor da classe Banco
      * 
-     * @param idCliente Identificador do cliente associado ao banco
-     * @param idMeta Identificador da meta associada ao banco
-     * @param nomeBanco Nome do banco
-     * @param saldo Saldo do banco
-     * @param transacao Transação do banco
-     * @param dividas Dívidas do banco
+     * @param nomeBanco 
+     * @param tipoBanco 
+     * @param metaVinculada 
+     * @param entrada 
      */
     constructor(
-        idCliente: number,
-        idMeta: number,
         nomeBanco: string,
-        saldo: number,
-        transacao: number,
-        dividas: number
+        tipoBanco: string,
+        metaVinculada: string,
+        entrada: number
     ) {
-        this.idCliente = idCliente;
-        this.idMeta = idMeta;
         this.nomeBanco = nomeBanco;
-        this.saldo = saldo;
-        this.transacao = transacao;
-        this.dividas = dividas;
+        this.tipoBanco = tipoBanco;
+        this.metaVinculada = metaVinculada;
+        this.entrada = entrada;
     }
 
     /* Métodos get e set */
@@ -67,42 +57,6 @@ export class Banco {
      */
     public setIdBanco(idBanco: number): void {
         this.idBanco = idBanco;
-    }
-
-    /**
-     * Recupera o identificador do cliente.
-     *
-     * @returns O identificador do cliente.
-     */
-    public getIdCliente(): number {
-        return this.idCliente;
-    }
-
-    /**
-     * Define o identificador do cliente.
-     * 
-     * @param idCliente - O identificador do cliente a ser definido.
-     */
-    public setIdCliente(idCliente: number): void {
-        this.idCliente = idCliente;
-    }
-
-    /**
-     * Recupera o identificador da meta.
-     *
-     * @returns O identificador da meta.
-     */
-    public getIdMeta(): number {
-        return this.idMeta;
-    }
-
-    /**
-     * Define o identificador da meta.
-     * 
-     * @param idMeta - O identificador da meta a ser definido.
-     */
-    public setIdMeta(idMeta: number): void {
-        this.idMeta = idMeta;
     }
 
     /**
@@ -124,66 +78,57 @@ export class Banco {
     }
 
     /**
-     * Recupera o saldo do banco.
+     * Recupera o tipo do banco.
      *
-     * @returns O saldo do banco.
+     * @returns O tipo do banco.
      */
-    public getSaldo(): number {
-        return this.saldo;
+    public getTipoBanco(): string {
+        return this.tipoBanco;
     }
 
     /**
-     * Define o saldo do banco.
+     * Define o tipo do banco.
      *
-     * @param saldo - O saldo do banco.
+     * @param tipoBanco - O tipo do banco.
      */
-    public setSaldo(saldo: number): void {
-        this.saldo = saldo;
+    public setTipoBanco(tipoBanco: string): void {
+        this.tipoBanco = tipoBanco;
     }
 
     /**
-     * Recupera a transação do banco.
+     * Recupera a meta vinculada do banco.
      *
-     * @returns O valor da transação do banco.
+     * @returns O valor da meta vinculada do banco.
      */
-    public getTransacao(): number {
-        return this.transacao;
+    public getMetaVinculada(): string {
+        return this.metaVinculada;
     }
 
     /**
-     * Define o valor da transação do banco.
+     * Define o valor da MetaVinculada do banco.
      *
-     * @param transacao - O valor da transação.
+     * @param MetaVinculada - O valor da MetaVinculada.
      */
-    public setTransacao(transacao: number): void {
-        this.transacao = transacao;
+    public setMetaVinculada(metaVinculada: string): void {
+        this.metaVinculada = metaVinculada;
     }
 
     /**
-     * Recupera as dívidas do banco.
+     * Recupera as entrada do banco.
      *
-     * @returns O valor das dívidas do banco.
+     * @returns O valor das entrada do banco.
      */
-    public getDividas(): number {
-        return this.dividas;
+    public getEntrada(): number {
+        return this.entrada;
     }
 
     /**
-     * Define as dívidas do banco.
+     * Define as entrada do banco.
      *
-     * @param dividas - O valor das dívidas do banco.
+     * @param entrada - O valor das entrada do banco.
      */
-    public setDividas(dividas: number): void {
-        this.dividas = dividas;
-    }
-
-
-    public getStatusBanco(): boolean {
-        return this.statusBanco;
-    }
-
-    public setStatusBanco(_statusBanco: boolean) {
-        this.statusBanco = _statusBanco
+    public setEntrada(entrada: number): void {
+        this.entrada = entrada;
     }
 
 
@@ -208,15 +153,13 @@ export class Banco {
             const respostaBD = await database.query(querySelectBanco);
 
             // usando a resposta para instanciar um objeto do tipo Banco
-            respostaBD.rows.forEach((linha: { id_cliente: number; id_meta: number; nome_banco: string; saldo: number; transacao: number; dividas: number; id_banco: number; }) => {
+            respostaBD.rows.forEach((linha: { id_banco: number; nome_banco: string; tipo_banco: string; meta_vinculada: string; entrada: number; }) => {
                 // instancia (cria) objeto Banco
                 const novoBanco = new Banco(
-                    linha.id_cliente,
-                    linha.id_meta,
                     linha.nome_banco,
-                    linha.saldo,
-                    linha.transacao,
-                    linha.dividas
+                    linha.tipo_banco,
+                    linha.meta_vinculada,
+                    linha.entrada
                 );
 
                 // atribui o ID objeto
@@ -238,14 +181,12 @@ export class Banco {
     static async cadastroBanco(banco: Banco): Promise<boolean> {
         try {
             // query para inserir um banco no banco de dados
-            const queryInsertBanco = `INSERT INTO banco (id_cliente, id_meta, nome_banco, saldo, transacao, dividas)
+            const queryInsertBanco = `INSERT INTO banco (nome_banco, tipo_banco, meta_vinculada, entrada)
                                     VALUES
-                                    ('${banco.getIdCliente()}', 
-                                    '${banco.getIdMeta()}', 
-                                    '${banco.getNomeBanco()}', 
-                                    ${banco.getSaldo()},
-                                    ${banco.getTransacao()},
-                                    ${banco.getDividas()})
+                                    ('${banco.getNomeBanco()}', 
+                                    '${banco.getTipoBanco()}', 
+                                    '${banco.getMetaVinculada()}', 
+                                    ${banco.getEntrada()})
                                     RETURNING id_banco;`;
 
             // executa a query no banco e armazena a resposta
@@ -274,33 +215,28 @@ export class Banco {
     * Atualiza os dados de um banco existente no banco de dados
     * 
     * @param idBanco : number
-    * @param idCliente : number'
-    * @param idMeta : number
-    * @param nomeBanco : string
-    * @param saldo : number
-    * @param transacao: number
-    * @param dividas : number
-    * @param statusBanco : boolean
+    * @param nomeBanco : string'
+    * @param tipoBanco : string
+    * @param metaVinculada : string
+    * @param entrada : number
     * @returns Promise com o resultado da atualização ou erro
     */
     static async atualizarBanco(
         idBanco: number,
-        idCliente: number,
-        idMeta: number,
         nomeBanco: string,
-        saldo: number,
-        transacao: number,
-        dividas: number
+        tipoBanco: string,
+        metaVinculada: string,
+        entrada: number
     ): Promise<any> {
         try {
             // Cria a consulta (query) para atualizar um banco
             const queryUpdateBanco = `UPDATE Banco
-            SET id_cliente = $1, id_meta = $2, nome_banco = $3, saldo = $4, transacao = $5, dividas = $6
+            SET nome_banco = $1, tipo_banco = $2, meta_vinculada = $3, entrada = $4
             WHERE id_banco = $7
             RETURNING id_banco;`;
 
             // estrutura os valores recebidos pela função em uma lista (array)
-            const valores = [idCliente, idMeta, nomeBanco, saldo, transacao, dividas, idBanco];
+            const valores = [nomeBanco, tipoBanco, metaVinculada, entrada, idBanco];
             // executa a consulta e armazena o resultado
             const resultado = await database.query(queryUpdateBanco, valores);
 
@@ -320,52 +256,6 @@ export class Banco {
         }
     }
 
-        /**
-     * Lista todos os bancos associados a um cliente específico.
-     * 
-     * @param idCliente - O identificador do cliente
-     * @returns Um array de objetos Banco ou null se ocorrer erro
-     */
-        static async listarBancosPorCliente(idCliente: number): Promise<Array<Banco> | null> {
-            const listaDeBancos: Array<Banco> = [];
-    
-            try {
-                // Query que filtra os bancos pelo id do cliente e status ativo
-                const query = `SELECT * FROM banco WHERE id_cliente = $1 AND status_banco = TRUE;`;
-    
-                // Executa a query
-                const respostaBD = await database.query(query, [idCliente]);
-    
-                // Itera sobre as linhas retornadas
-                respostaBD.rows.forEach((linha: {
-                    id_cliente: number;
-                    id_meta: number;
-                    nome_banco: string;
-                    saldo: number;
-                    transacao: number;
-                    dividas: number;
-                    id_banco: number;
-                }) => {
-                    const banco = new Banco(
-                        linha.id_cliente,
-                        linha.id_meta,
-                        linha.nome_banco,
-                        linha.saldo,
-                        linha.transacao,
-                        linha.dividas
-                    );
-                    banco.setIdBanco(linha.id_banco);
-                    listaDeBancos.push(banco);
-                });
-    
-                return listaDeBancos;
-            } catch (error) {
-                console.error("Erro ao listar bancos por cliente:", error);
-                return null;
-            }
-        }
-    
-    
 
     static async removerBanco(idBanco: number): Promise<any> {
         try {

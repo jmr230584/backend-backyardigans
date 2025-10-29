@@ -331,6 +331,8 @@ export class Meta {
             // executa a query para remover empréstimo
             await database.query(queryDeleteMetaBanco);
 
+            
+
             // Construção da query SQL para deletar a meta.
             const queryDeleteMeta = `UPDATE meta
                                         SET status_meta = FALSE 

@@ -9,8 +9,8 @@ const SERVER_ROUTES = {
     REMOVER_META: '/remove/meta',
     LISTAR_METAS: '/lista/metas',
 
-    NOVO_BANCO: '/novo/emprestimo',
-    ATUALIZAR_BANCO: '/atualiza/emprestimo',
+    NOVO_BANCO: '/novo/banco',
+    ATUALIZAR_BANCO: '/atualiza/banco',
     LISTAR_BANCOS: '/lista/bancos',
     REMOVER_BANCO: '/remove/banco',
 

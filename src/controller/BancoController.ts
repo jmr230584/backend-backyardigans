@@ -2,12 +2,10 @@ import { Request, Response } from "express";
 import { Banco } from "../model/Banco";
 
 interface BancoDTO {
-  idCliente: number;
-  idMeta: number;
   nomeBanco: string;
-  saldo: number;
-  transacao: number;
-  dividas: number;
+  tipoBanco: string;
+  metaVinculada?: string;
+  entrada: number;
 }
 
 export class BancoController {
@@ -25,12 +23,10 @@ export class BancoController {
     try {
       const bancoRecebido: BancoDTO = req.body;
       const novoBanco = new Banco(
-        bancoRecebido.idCliente,
-        bancoRecebido.idMeta,
         bancoRecebido.nomeBanco,
-        bancoRecebido.saldo,
-        bancoRecebido.transacao,
-        bancoRecebido.dividas
+        bancoRecebido.tipoBanco,
+        bancoRecebido.metaVinculada ?? '',
+        bancoRecebido.entrada
       );
       const respostaClasse = await Banco.cadastroBanco(novoBanco);
       if (respostaClasse) {
@@ -50,23 +46,19 @@ export class BancoController {
       const idBanco = parseInt(req.query.idBanco as string);
       if (
         !idBanco ||
-        !dadosRecebidos.idCliente ||
-        !dadosRecebidos.idMeta ||
         !dadosRecebidos.nomeBanco ||
-        !dadosRecebidos.saldo ||
-        !dadosRecebidos.transacao ||
-        !dadosRecebidos.dividas
+        !dadosRecebidos.tipoBanco ||
+        !dadosRecebidos.metaVinculada ||
+        !dadosRecebidos.entrada
       ) {
         return res.status(400).json({ message: 'Todos os campos são obrigatórios.' });
       }
       const bancoAtualizado = await Banco.atualizarBanco(
         idBanco,
-        dadosRecebidos.idCliente,
-        dadosRecebidos.idMeta,
         dadosRecebidos.nomeBanco,
-        dadosRecebidos.saldo,
-        dadosRecebidos.transacao,
-        dadosRecebidos.dividas
+        dadosRecebidos.tipoBanco,
+        dadosRecebidos.metaVinculada,
+        dadosRecebidos.entrada
       );
       return res.status(200).json({ message: 'Banco atualizado com sucesso', idBanco: bancoAtualizado });
     } catch (error) {
@@ -87,20 +79,6 @@ export class BancoController {
     } catch (error) {
       console.log(`Erro ao remover um banco. ${error}`);
       return res.status(400).json({ mensagem: "Não foi possível remover o banco. Entre em contato com o administrador do sistema." });
-    }
-  }
-
-  static async listarBancosPorCliente(req: Request, res: Response): Promise<any> {
-    try {
-      const { idCliente } = req.params;
-      if (!idCliente || isNaN(Number(idCliente))) {
-        return res.status(400).json({ mensagem: "ID do cliente inválido." });
-      }
-      const bancosDoCliente = await Banco.listarBancosPorCliente(Number(idCliente));
-      return res.status(200).json(bancosDoCliente);
-    } catch (error) {
-      console.error("Erro ao buscar bancos por cliente:", error);
-      return res.status(500).json({ mensagem: "Erro interno ao buscar bancos por cliente." });
     }
   }
 }
