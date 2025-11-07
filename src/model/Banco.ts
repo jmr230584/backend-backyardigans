@@ -186,7 +186,7 @@ export class Banco {
                                     ('${banco.getNomeBanco()}', 
                                     '${banco.getTipoBanco()}', 
                                     '${banco.getMetaVinculada()}', 
-                                    ${banco.getEntrada()})
+                                    '${banco.getEntrada()}')
                                     RETURNING id_banco;`;
 
             // executa a query no banco e armazena a resposta
@@ -215,7 +215,7 @@ export class Banco {
     * Atualiza os dados de um banco existente no banco de dados
     * 
     * @param idBanco : number
-    * @param nomeBanco : string'
+    * @param nomeBanco : string
     * @param tipoBanco : string
     * @param metaVinculada : string
     * @param entrada : number

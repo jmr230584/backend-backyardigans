@@ -17,12 +17,12 @@ CREATE TABLE meta(
 );
 
 CREATE TABLE banco (
-    id_banco SERIAL PRIMARY KEY,     
-    nome_banco VARCHAR(100) NOT NULL,          
-    tipo_banco VARCHAR(50) NOT NULL,            
-    meta_vinculada INT,                        
-    entrada DECIMAL(10,2) DEFAULT 0.00,         
-    CONSTRAINT fk_meta FOREIGN KEY (meta_vinculada) REFERENCES meta(id_meta) 
+    id_banco SERIAL PRIMARY KEY,    
+    nome_banco VARCHAR(100) NOT NULL,            
+    tipo_banco VARCHAR(50) NOT NULL,             
+    meta_vinculada INT,                          
+    entrada DECIMAL(10,2) DEFAULT 0.00,          
+    CONSTRAINT fk_meta FOREIGN KEY (meta_vinculada) REFERENCES meta(id_meta)
 );
 
 
