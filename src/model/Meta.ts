@@ -221,24 +221,6 @@ export class Meta {
         }
     }
 
-    /**
-     * Realiza o cadastro de uma meta no banco de dados.
-     * 
-     * Esta função recebe um objeto do tipo `Meta` e insere seus dados (nomeMeta, dataInicial, dataFinal, 
-     * categorizacao, valor)
-     * na tabela `meta` do banco de dados. O método retorna um valor booleano indicando se o cadastro 
-     * foi realizado com sucesso.
-     * 
-     * @param {Livro} livro - Objeto contendo os dados da meta que será cadastrado. O objeto `Livro`
-     *                        deve conter os métodos `getNomeMeta()`, `getDataInicial()`, `getDataFinal()`, `getCategorizacao()`,
-     *                        `getValor()`
-     *                        que retornam os respectivos valores da meta.
-     * @returns {Promise<boolean>} - Retorna `true` se a meta foi cadastrado com sucesso e `false` caso contrário.
-     *                               Em caso de erro durante o processo, a função trata o erro e retorna `false`.
-     * 
-     * @throws {Error} - Se ocorrer algum erro durante a execução do cadastro, uma mensagem de erro é exibida
-     *                   no console junto com os detalhes do erro.
-     */
     static async cadastroMeta(meta: Meta): Promise<boolean> {
         try {
             // query para fazer insert de uma meta no banco de dados

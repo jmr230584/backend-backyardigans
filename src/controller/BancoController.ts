@@ -4,15 +4,16 @@ import { Banco } from "../model/Banco";
 interface BancoDTO {
   nomeBanco: string;
   tipoBanco: string;
-  metaVinculada?: string;
+  metaVinculada: number;
   entrada: number;
 }
 
-export class BancoController {
+export class BancoController extends Banco {
+
   static async lista(req: Request, res: Response): Promise<any> {
     try {
-      const listaDeContas = await Banco.listarBancos();
-      return res.status(200).json(listaDeContas);
+      const listaDeBancos = await Banco.listarBancos();
+      return res.status(200).json(listaDeBancos);
     } catch (error) {
       console.log('Erro ao acessar a listagem de contas bancárias');
       return res.status(400).json({ mensagem: "Não foi possível acessar a listagem de contas bancárias" });
@@ -25,10 +26,11 @@ export class BancoController {
       const novoBanco = new Banco(
         bancoRecebido.nomeBanco,
         bancoRecebido.tipoBanco,
-        bancoRecebido.metaVinculada ?? '',
-        bancoRecebido.entrada
+        bancoRecebido.metaVinculada,
+        bancoRecebido.entrada,
       );
       const respostaClasse = await Banco.cadastroBanco(novoBanco);
+      console.log(novoBanco);
       if (respostaClasse) {
         return res.status(200).json({ mensagem: "Banco cadastrado com sucesso!" });
       } else {

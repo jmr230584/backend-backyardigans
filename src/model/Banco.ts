@@ -16,7 +16,7 @@ export class Banco {
     /* tipo do banco */
     private tipoBanco: string;
     /* meta vinculada */
-    private metaVinculada: string;
+    private metaVinculada: number;
     /* entrada */
     private entrada: number;
      /*status de registro do banco*/
@@ -33,7 +33,7 @@ export class Banco {
     constructor(
         nomeBanco: string,
         tipoBanco: string,
-        metaVinculada: string,
+        metaVinculada: number,
         entrada: number
     ) {
         this.nomeBanco = nomeBanco;
@@ -100,7 +100,7 @@ export class Banco {
      *
      * @returns O valor da meta vinculada do banco.
      */
-    public getMetaVinculada(): string {
+    public getMetaVinculada(): number{
         return this.metaVinculada;
     }
 
@@ -109,7 +109,7 @@ export class Banco {
      *
      * @param MetaVinculada - O valor da MetaVinculada.
      */
-    public setMetaVinculada(metaVinculada: string): void {
+    public setMetaVinculada(metaVinculada: number): void {
         this.metaVinculada = metaVinculada;
     }
 
@@ -131,6 +131,23 @@ export class Banco {
         this.entrada = entrada;
     }
 
+        /**
+     * Retorna o status do banco no sistema
+     * 
+     * @return Status do banco no sistema
+     */
+    public getStatusBanco(): boolean {
+        return this.statusBanco;
+    }
+
+    /**
+     * Atribui um valor ao status do banco
+     * 
+     * @param _statusBanco : Valor a ser atribuido ao status do banco
+     */
+    public setStatusBanco(_statusBanco: boolean) {
+        this.statusBanco = _statusBanco;
+    }
 
     /**
      * Busca e retorna uma lista de bancos do banco de dados.
@@ -153,17 +170,18 @@ export class Banco {
             const respostaBD = await database.query(querySelectBanco);
 
             // usando a resposta para instanciar um objeto do tipo Banco
-            respostaBD.rows.forEach((linha: { id_banco: number; nome_banco: string; tipo_banco: string; meta_vinculada: string; entrada: number; }) => {
+            respostaBD.rows.forEach((banco: any) => {
                 // instancia (cria) objeto Banco
                 const novoBanco = new Banco(
-                    linha.nome_banco,
-                    linha.tipo_banco,
-                    linha.meta_vinculada,
-                    linha.entrada
+                    banco.nome_banco,
+                    banco.tipo_banco,
+                    banco.meta_vinculada,
+                    banco.entrada
                 );
 
                 // atribui o ID objeto
-                novoBanco.setIdBanco(linha.id_banco);
+                novoBanco.setIdBanco(banco.id_banco);
+                novoBanco.setStatusBanco(banco.status_banco);
 
                 // adiciona o objeto na lista
                 listaDeBancos.push(novoBanco);
@@ -217,7 +235,7 @@ export class Banco {
     * @param idBanco : number
     * @param nomeBanco : string
     * @param tipoBanco : string
-    * @param metaVinculada : string
+    * @param metaVinculada : number
     * @param entrada : number
     * @returns Promise com o resultado da atualização ou erro
     */
@@ -225,7 +243,7 @@ export class Banco {
         idBanco: number,
         nomeBanco: string,
         tipoBanco: string,
-        metaVinculada: string,
+        metaVinculada: number,
         entrada: number
     ): Promise<any> {
         try {
