@@ -42,7 +42,7 @@ class UsuarioController extends Usuario {
             RETURNING *;
         `;
 
-        const senhaCriptografada = await bcrypt.hash(senha, 10); // 🔒 bcrypt aqui
+        const senhaCriptografada = await bcrypt.hash(senha, 10); 
 
         const result = await database.query(query, [
             nome,

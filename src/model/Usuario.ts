@@ -204,7 +204,7 @@ export class Usuario {
                 usuario.getNome(),
                 usuario.getUsername(),
                 usuario.getEmail(),
-                usuario.getSenha() // ← já está criptografada
+                usuario.getSenha() 
             ];
     
             const resultado = await database.query(query, valores);

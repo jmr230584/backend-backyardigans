@@ -42,7 +42,8 @@ router.get("/profile", Auth.verifyToken, (req, res) => {
         user: {
             id: req.body.userId,
             nome: req.body.nome,
-            username: req.body.username
+            username: req.body.username,
+            
         }
     });
 });
