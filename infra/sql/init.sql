@@ -16,16 +16,13 @@ CREATE TABLE meta(
     valor DECIMAL(10,2) NOT NULL
 );
 
-CREATE TABLE banco(
-    id_banco SERIAL PRIMARY KEY,
-    id_cliente INT NOT NULL,
-    id_meta INT NOT NULL,
-    nome_banco VARCHAR(100) NOT NULL,
-    saldo DECIMAL(10,2),
-    transacao DECIMAL(10,2),
-    dividas DECIMAL(10,2),
-    FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente),
-    FOREIGN KEY (id_meta) REFERENCES meta(id_meta)
+CREATE TABLE banco (
+    id_banco SERIAL PRIMARY KEY,    
+    nome_banco VARCHAR(100) NOT NULL,            
+    tipo_banco VARCHAR(50) NOT NULL,             
+    meta_vinculada INT,                          
+    entrada DECIMAL(10,2) DEFAULT 0.00,          
+    CONSTRAINT fk_meta FOREIGN KEY (meta_vinculada) REFERENCES meta(id_meta)
 );
 
 
@@ -47,13 +44,6 @@ INSERT INTO meta (nome_meta, data_inicial, data_final, categorizacao, valor) VAL
 ('comprar um arco', '2025-03-01', '2025-05-31', 'Desafio', 30000.00),
 ('ajudar a irmã', '2025-04-01', '2025-09-30', 'Ação', 45000.00),
 ('comprar mapa-labirinto', '2025-05-01', '2025-12-01', 'Sobrevivência', 35000.00);
-
-INSERT INTO banco (id_cliente, id_meta, nome_banco, saldo, transacao, dividas) VALUES
-(1, 1, 'Banco Olímpico', 10000.00, 2000.00, 1500.00),
-(2, 2, 'Gringotes', 12000.00, 3000.00, 800.00),
-(3, 3, 'Banco Capitol', 15000.00, 2500.00, 1200.00),
-(4, 4, 'Banco Dauntless', 11000.00, 1800.00, 700.00),
-(5, 5, 'Banco Glade', 13000.00, 2200.00, 1000.00);
 
 
 -- CREATE USUARIOS
