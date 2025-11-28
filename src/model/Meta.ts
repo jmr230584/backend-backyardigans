@@ -300,45 +300,28 @@ export class Meta {
    * @param idMeta ID da meta a ser removido
    * @returns Boolean indicando se a remoção foi bem-sucedida
   */
-    static async removerMeta(id_meta: number): Promise<Boolean> {
-        // variável de controle da execução da query
-        let queryResult = false;
-
+    static async removerMeta(idMeta: number): Promise<any> {
         try {
-            // Cria a consulta para remover meta do banco de dados
-            const queryDeleteMetaBanco = `UPDATE banco
-                                         SET status_banco = FALSE 
-                                         WHERE id_meta = ${id_meta}`;
+            console.log("ID recebido para remoção:", idMeta);
+            if (!idMeta || isNaN(idMeta)) {
+                console.error("Erro: ID da meta inválido!");
+                return false;
+            }
+            const queryRemoverMeta = ` UPDATE meta
+                                            SET status_meta = FALSE
+                                            WHERE id_meta = ${idMeta}`;
 
-            // executa a query para remover empréstimo
-            await database.query(queryDeleteMetaBanco);
+            const respostaBD = await database.query(queryRemoverMeta);
 
-            
+            if (respostaBD.rowCount != 0) {
+                console.log(`Meta removida com sucesso! ID da meta: ${idMeta}`);
+                return true;
+            }
+            return false;
 
-            // Construção da query SQL para deletar a meta.
-            const queryDeleteMeta = `UPDATE meta
-                                        SET status_meta = FALSE 
-                                        WHERE id_meta = ${id_meta};`;
-
-            // Executa a query de exclusão e verifica se a operação foi bem-sucedida.
-            await database.query(queryDeleteMeta)
-                .then((result) => {
-                    if (result.rowCount != 0) {
-                        queryResult = true; // Se a operação foi bem-sucedida, define queryResult como true.
-                    }
-                });
-
-            // retorna o valor da variável de controle
-            return queryResult;
-
-            // captura qualquer erro que possa acontecer
         } catch (error) {
-            // Exibe detalhes do erro no console
-            console.log(`Erro na consulta: ${error}`);
-            // retorna o valor fa variável de controle
-            return queryResult;
+            console.log(`Erro ao remover uma meta. ${error}`);
+            return false;
         }
     }
-
-
 }

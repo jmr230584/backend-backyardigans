@@ -28,8 +28,8 @@ router.put(SERVER_ROUTES.ATUALIZAR_META, MetaController.atualizar);
 //CRUD Banco
 router.get(SERVER_ROUTES.LISTAR_BANCOS, BancoController.lista);
 router.post(SERVER_ROUTES.NOVO_BANCO, BancoController.novo);
-router.put(SERVER_ROUTES.ATUALIZAR_BANCO, BancoController.atualizar);
 router.put(SERVER_ROUTES.REMOVER_BANCO, BancoController.remover);
+router.put(SERVER_ROUTES.ATUALIZAR_BANCO, BancoController.atualizar);
 
 // Cadastro de Usuário com Upload de Imagem de Perfil
 router.post(SERVER_ROUTES.NOVO_USUARIO, upload.single('imagemPerfil'), UsuarioController.cadastrar);

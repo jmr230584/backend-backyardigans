@@ -1,3 +1,4 @@
+import { resourceLimits } from "worker_threads";
 import { DataBaseModel } from "./DatabaseModel";
 
 // armazenei o pool de conexões
@@ -19,7 +20,7 @@ export class Banco {
     private metaVinculada: number;
     /* entrada */
     private entrada: number;
-     /*status de registro do banco*/
+    /*status de registro do banco*/
     private statusBanco: boolean = true;
 
     /**
@@ -30,7 +31,7 @@ export class Banco {
      * @param metaVinculada 
      * @param entrada 
      */
-    constructor(
+    public constructor(
         nomeBanco: string,
         tipoBanco: string,
         metaVinculada: number,
@@ -100,7 +101,7 @@ export class Banco {
      *
      * @returns O valor da meta vinculada do banco.
      */
-    public getMetaVinculada(): number{
+    public getMetaVinculada(): number {
         return this.metaVinculada;
     }
 
@@ -131,11 +132,11 @@ export class Banco {
         this.entrada = entrada;
     }
 
-        /**
-     * Retorna o status do banco no sistema
-     * 
-     * @return Status do banco no sistema
-     */
+    /**
+ * Retorna o status do banco no sistema
+ * 
+ * @return Status do banco no sistema
+ */
     public getStatusBanco(): boolean {
         return this.statusBanco;
     }
@@ -143,10 +144,10 @@ export class Banco {
     /**
      * Atribui um valor ao status do banco
      * 
-     * @param _statusBanco : Valor a ser atribuido ao status do banco
+     * @param statusBanco : Valor a ser atribuido ao status do banco
      */
-    public setStatusBanco(_statusBanco: boolean) {
-        this.statusBanco = _statusBanco;
+    public setStatusBanco(statusBanco: boolean) {
+        this.statusBanco = statusBanco;
     }
 
     /**
@@ -229,67 +230,48 @@ export class Banco {
         }
     }
 
-    /**
-    * Atualiza os dados de um banco existente no banco de dados
-    * 
-    * @param idBanco : number
-    * @param nomeBanco : string
-    * @param tipoBanco : string
-    * @param metaVinculada : number
-    * @param entrada : number
-    * @returns Promise com o resultado da atualização ou erro
-    */
-    static async atualizarBanco(
-        idBanco: number,
-        nomeBanco: string,
-        tipoBanco: string,
-        metaVinculada: number,
-        entrada: number
-    ): Promise<any> {
+    static async atualizarBanco(banco: Banco): Promise<Boolean> {
+        let queryResult = false;
         try {
-            // Cria a consulta (query) para atualizar um banco
-            const queryUpdateBanco = `UPDATE Banco
-            SET nome_banco = $1, tipo_banco = $2, meta_vinculada = $3, entrada = $4
-            WHERE id_banco = $7
-            RETURNING id_banco;`;
+            const queryAtualizarBanco = `UPDATE banco SET
+                nome_banco = '${banco.getNomeBanco().toUpperCase()}',
+                tipo_banco = '${banco.getTipoBanco().toUpperCase()}',
+                meta_vinculada = ${banco.getMetaVinculada()},
+                entrada = ${banco.getEntrada()}
+                WHERE id_banco = ${banco.getIdBanco()};`;
 
-            // estrutura os valores recebidos pela função em uma lista (array)
-            const valores = [nomeBanco, tipoBanco, metaVinculada, entrada, idBanco];
-            // executa a consulta e armazena o resultado
-            const resultado = await database.query(queryUpdateBanco, valores);
+            await database.query(queryAtualizarBanco)
+                .then((result) => {
+                    if (result.rowCount != 0) {
+                        queryResult = true;
+                    }
+                });
 
-            // verifica se o empréstimo não existe
-            if (resultado.rowCount === 0) {
-                // lança um novo erro
-                throw new Error('Banco não encontrado.');
-            }
 
-            return resultado.rows[0].id_banco; // Retorna o ID do banco atualizado
+            return queryResult;
             // captura qualquer erro que possa acontecer
         } catch (error) {
             // exibe detalhes do erro no console
-            console.error(`Erro ao atualizar banco: ${error}`);
-            // lança um novo erro
-            throw new Error('Erro ao atualizar o banco.');
+            console.log(`Erro na consulta: ${error}`);
+            // retorna o valor da variável de controle
+            return queryResult;
         }
     }
 
-
     static async removerBanco(idBanco: number): Promise<any> {
         try {
-
             console.log("ID recebido para remoção:", idBanco);
             if (!idBanco || isNaN(idBanco)) {
                 console.error("Erro: ID do banco inválido!");
                 return false;
             }
             //cria uma query para deletar um objeto do banco de dados, passando como parametro o id do banco recebido na função
-            const queryUpdateBanco = ` UPDATE banco
+            const queryRemoverBanco = ` UPDATE banco
                                             SET status_banco = FALSE
                                             WHERE id_banco = ${idBanco}`;
 
             //executar a query e armazenar a resposta do BD
-            const respostaBD = await database.query(queryUpdateBanco);
+            const respostaBD = await database.query(queryRemoverBanco);
 
             //verifica se a quantidade de linhas modificadas é diferente de 0
             if (respostaBD.rowCount != 0) {

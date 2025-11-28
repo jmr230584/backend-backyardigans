@@ -45,27 +45,25 @@ export class BancoController extends Banco {
   static async atualizar(req: Request, res: Response): Promise<any> {
     try {
       const dadosRecebidos: BancoDTO = req.body;
-      const idBanco = parseInt(req.query.idBanco as string);
-      if (
-        !idBanco ||
-        !dadosRecebidos.nomeBanco ||
-        !dadosRecebidos.tipoBanco ||
-        !dadosRecebidos.metaVinculada ||
-        !dadosRecebidos.entrada
-      ) {
-        return res.status(400).json({ message: 'Todos os campos são obrigatórios.' });
-      }
-      const bancoAtualizado = await Banco.atualizarBanco(
-        idBanco,
+
+      const banco = new Banco(
         dadosRecebidos.nomeBanco,
         dadosRecebidos.tipoBanco,
         dadosRecebidos.metaVinculada,
-        dadosRecebidos.entrada
+        dadosRecebidos.entrada,
       );
-      return res.status(200).json({ message: 'Banco atualizado com sucesso', idBanco: bancoAtualizado });
+
+      banco.setIdBanco(parseInt(req.query.idBanco as string));
+
+      if (await Banco.atualizarBanco(banco)) {
+        return res.status(200).json({ mensagem: "Banco atualizado com sucesso!" });
+      } else { 
+        return res.status(400).json({ mensagem: "Erro ao atualizar o banco. Entre em contato com o administrador do sistema." });
+      }
+
     } catch (error) {
-      console.error('Erro ao atualizar o banco:', error);
-      return res.status(500).json({ message: 'Erro ao atualizar o banco.' });
+      console.log(`Erro ao atualizar um banco. ${error}`);
+      return res.status(400).json({ mensagem: "Não foi possível atualizar o banco. Entre em contato com o administrador do sistema." });
     }
   }
 
