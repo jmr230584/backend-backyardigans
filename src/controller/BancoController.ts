@@ -55,6 +55,8 @@ export class BancoController extends Banco {
 
       banco.setIdBanco(parseInt(req.query.idBanco as string));
 
+      console.log(banco);
+
       if (await Banco.atualizarBanco(banco)) {
         return res.status(200).json({ mensagem: "Banco atualizado com sucesso!" });
       } else { 

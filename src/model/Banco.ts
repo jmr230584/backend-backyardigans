@@ -247,8 +247,11 @@ export class Banco {
                     }
                 });
 
+             console.log(`Banco atualizado com sucesso! ID do banco: ${banco.getIdBanco()}`); 
 
             return queryResult;
+
+           
             // captura qualquer erro que possa acontecer
         } catch (error) {
             // exibe detalhes do erro no console

@@ -10,7 +10,7 @@ const SERVER_ROUTES = {
     LISTAR_METAS: '/lista/metas',
 
     NOVO_BANCO: '/novo/banco',
-    ATUALIZAR_BANCO: '/atualiza/banco',
+    ATUALIZAR_BANCO: '/atualizar/banco',
     LISTAR_BANCOS: '/lista/bancos',
     REMOVER_BANCO: '/remove/banco',
 
