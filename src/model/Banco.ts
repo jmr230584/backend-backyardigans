@@ -234,8 +234,8 @@ export class Banco {
         let queryResult = false;
         try {
             const queryAtualizarBanco = `UPDATE banco SET
-                nome_banco = '${banco.getNomeBanco().toUpperCase()}',
-                tipo_banco = '${banco.getTipoBanco().toUpperCase()}',
+                nome_banco = '${banco.getNomeBanco()}',
+                tipo_banco = '${banco.getTipoBanco()}',
                 meta_vinculada = ${banco.getMetaVinculada()},
                 entrada = ${banco.getEntrada()}
                 WHERE id_banco = ${banco.getIdBanco()};`;

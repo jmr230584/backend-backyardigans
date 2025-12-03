@@ -13,6 +13,8 @@ router.get('/', (req, res) => {
     res.json({ mensagem: "Rota padrão" })
 });
 
+router.post("/novo/usuario", UsuarioController.cadastrar);
+
 // CRUD Cliente
 router.get(SERVER_ROUTES.LISTAR_CLIENTES, ClienteController.lista);
 router.post(SERVER_ROUTES.NOVO_CLIENTE, ClienteController.novo);
