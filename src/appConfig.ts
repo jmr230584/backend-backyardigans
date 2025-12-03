@@ -5,7 +5,7 @@ const SERVER_ROUTES = {
     LISTAR_CLIENTES: '/lista/clientes',
 
     NOVA_META: '/nova/meta',
-    ATUALIZAR_META: '/atualiza/meta',
+    ATUALIZAR_META: '/atualizar/meta',
     REMOVER_META: '/remove/meta',
     LISTAR_METAS: '/lista/metas',
 

@@ -269,12 +269,12 @@ export class Meta {
         try {
             // Construção da query SQL para atualizar os dados da meta no banco de dados.
             const queryAtualizarMeta = `UPDATE meta SET 
-                                            nome_meta = '${meta.getNomeMeta().toUpperCase()}', 
+                                            nome_meta = '${meta.getNomeMeta()}', 
                                             data_inicial = '${meta.getDataInicial()}',
                                             data_final = '${meta.getDataFinal()}', 
-                                            categorizacao = '${meta.getCategorizacao().toUpperCase()}',
+                                            categorizacao = '${meta.getCategorizacao()}',
                                             valor = ${meta.getValor()}
-                                            WHERE id_meta = ${meta.idMeta}`;
+                                            WHERE id_meta = ${meta.getIdMeta()};`;
 
             // Executa a query de atualização e verifica se a operação foi bem-sucedida.
             await database.query(queryAtualizarMeta)
@@ -283,6 +283,9 @@ export class Meta {
                         queryResult = true; // Se a operação foi bem-sucedida, define queryResult como true.
                     }
                 });
+
+
+            console.log(`Meta atualizada com sucesso! ID da meta: ${meta.getIdMeta()}`);
 
             // Retorna o resultado da operação para quem chamou a função.
             return queryResult;
