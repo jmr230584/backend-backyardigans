@@ -152,4 +152,33 @@ export class MetaController extends Meta {
         }
     }
 
+    /**
+     * Busca uma única meta pelo ID fornecido na Query String.
+     * @param req Objeto de requisição HTTP (espera req.query.idMeta).
+     * @param res Objeto de resposta HTTP.
+     * @returns Meta encontrada em formato JSON (200) ou 404/400.
+     */
+    static async buscarPorId(req: Request, res: Response): Promise<any> {
+        try {
+            const idMeta = parseInt(req.query.idMeta as string);
+
+            if (isNaN(idMeta)) {
+                return res.status(400).json({ mensagem: "ID de meta inválido." });
+            }
+
+            // 🛑 AQUI você deve chamar a função de busca (ex: Meta.buscarPorId)
+            const metaEncontrada = await Meta.buscarMetaPorId(idMeta); 
+
+            if (metaEncontrada) {
+                return res.status(200).json(metaEncontrada);
+            } else {
+                return res.status(404).json({ mensagem: "Meta não encontrada." });
+            }
+
+        } catch (error) {
+            console.error(`Erro ao buscar meta por ID: ${error}`);
+            return res.status(500).json({ mensagem: "Erro interno do servidor ao buscar meta." });
+        }
+    }
+
 }

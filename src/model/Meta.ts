@@ -1,4 +1,5 @@
 import { DataBaseModel } from "./DataBaseModel";
+import { QueryResult } from "pg";
 
 // armazenei o pool de conexões
 const database = new DataBaseModel().pool;
@@ -169,6 +170,47 @@ export class Meta {
      */
     public setStatusMeta(_statusMeta: boolean) {
         this.statusMeta = _statusMeta;
+    }
+
+    /**
+     * Busca uma única meta no banco de dados pelo seu ID.
+     * @param id O identificador da meta a ser buscada.
+     * @returns Um objeto `Meta` preenchido, ou `null` se não for encontrado ou ocorrer um erro.
+     */
+    static async buscarMetaPorId(id: number): Promise<Meta | null> {
+        try {
+            const querySelectMeta = `SELECT * FROM meta WHERE id_meta = $1 AND status_meta = TRUE;`;
+            
+            // Usando parameterized query para segurança
+            const respostaBD: QueryResult = await database.query(querySelectMeta, [id]);
+
+            if (respostaBD.rowCount != 0) {
+                const meta = respostaBD.rows[0];
+                
+                // Instancia o objeto Meta com os dados do banco
+                const metaEncontrada = new Meta(
+                    meta.nome_meta,
+                    meta.data_inicial,
+                    meta.data_final,
+                    meta.categorizacao,
+                    meta.valor
+                );
+
+                // Atribui o ID e status
+                metaEncontrada.setIdMeta(meta.id_meta);
+                metaEncontrada.setStatusMeta(meta.status_meta);
+                
+                return metaEncontrada;
+            }
+
+            // Meta não encontrada
+            return null;
+
+        } catch (error) {
+            console.log(`Erro ao buscar meta por ID ${id}. Verifique os logs para mais detalhes.`);
+            console.error(error);
+            return null;
+        }
     }
 
 

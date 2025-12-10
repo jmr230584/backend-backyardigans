@@ -403,4 +403,93 @@ export class Banco {
             return false;
         }
     }
+
+    // Dentro da export class Banco { ... }
+
+// ... (após removerBanco ou em qualquer lugar das funções estáticas)
+    
+    /**
+     * Registra uma transação (Receita ou Despesa), atualizando o saldo e os campos
+     * 'transacao' (para Receita) ou 'dividas' (para Despesa) do banco do cliente.
+     * * @param idCliente - O ID do cliente dono da transação.
+     * @param tipo - O tipo de transação ('RECEITA' ou 'DESPESA').
+     * @param valor - O valor da transação.
+     * @returns Promise<boolean> - Retorna true se a atualização for bem-sucedida.
+     */
+    static async registrarTransacao(idCliente: number, tipo: 'RECEITA' | 'DESPESA', valor: number): Promise<boolean> {
+        let conn; // Variável para a conexão, usada em transações
+        try {
+            // 1. OBTEM O BANCO ATUAL DO CLIENTE (assumindo 1 banco por cliente ou pegando o primeiro)
+            // É crucial usar uma transação de banco de dados para garantir a integridade.
+            conn = await database.connect(); // Obtém a conexão do pool
+            await conn.query('BEGIN'); // Inicia a transação (garante que UPDATE e SELECT sejam atômicos)
+
+            // Seleciona o primeiro banco ativo do cliente para ser atualizado
+            const querySelectBanco = `SELECT id_banco, saldo, transacao, dividas 
+                                      FROM banco 
+                                      WHERE id_cliente = $1 AND status_banco = TRUE 
+                                      LIMIT 1;`;
+            
+            const resultadoBanco = await conn.query(querySelectBanco, [idCliente]);
+
+            if (resultadoBanco.rowCount === 0) {
+                await conn.query('ROLLBACK'); // Desfaz a transação
+                console.error(`Cliente ID ${idCliente} não possui bancos ativos para transacionar.`);
+                return false;
+            }
+
+            const bancoAtual = resultadoBanco.rows[0];
+            const idBanco = bancoAtual.id_banco;
+            let novoSaldo = parseFloat(bancoAtual.saldo);
+            let novaTransacao = parseFloat(bancoAtual.transacao);
+            let novaDividas = parseFloat(bancoAtual.dividas);
+
+            // 2. CALCULA OS NOVOS VALORES
+            if (tipo === 'RECEITA') {
+                novoSaldo += valor;
+                novaTransacao += valor; // Adiciona a receita ao campo 'transacao'
+                console.log(`Receita registrada. Novo saldo: ${novoSaldo}`);
+            } else if (tipo === 'DESPESA') {
+                novoSaldo -= valor;
+                novaDividas += valor; // Adiciona a despesa ao campo 'dividas'
+                console.log(`Despesa registrada. Novo saldo: ${novoSaldo}`);
+            } else {
+                await conn.query('ROLLBACK');
+                console.error(`Tipo de transação inválido: ${tipo}`);
+                return false;
+            }
+            
+            // 3. ATUALIZA O REGISTRO DO BANCO
+            const queryUpdateTransacao = `UPDATE banco
+                                          SET saldo = $1, transacao = $2, dividas = $3
+                                          WHERE id_banco = $4
+                                          RETURNING id_banco;`;
+
+            const valoresUpdate = [novoSaldo, novaTransacao, novaDividas, idBanco];
+            
+            const resultadoUpdate = await conn.query(queryUpdateTransacao, valoresUpdate);
+
+            if (resultadoUpdate.rowCount === 0) {
+                await conn.query('ROLLBACK');
+                console.error(`Falha ao atualizar o banco ID ${idBanco}.`);
+                return false;
+            }
+
+            await conn.query('COMMIT'); // Confirma as alterações no banco de dados
+            console.log(`Transação de ${tipo} de R$ ${valor.toFixed(2)} registrada com sucesso no banco ID ${idBanco}.`);
+            return true;
+
+        } catch (error) {
+            if (conn) {
+                await conn.query('ROLLBACK'); // Desfaz tudo em caso de erro
+            }
+            console.error('Erro geral ao registrar transação:', error);
+            return false;
+        } finally {
+            if (conn) {
+                conn.release(); // Libera a conexão de volta para o pool
+            }
+        }
+    }
 }
+

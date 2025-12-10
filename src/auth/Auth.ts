@@ -1,23 +1,32 @@
-// imports
-import jwt from 'jsonwebtoken';
+// src/auth/Auth.ts
+
+import jwt, { JwtPayload as BaseJwtPayload } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { DataBaseModel } from '../model/DataBaseModel';
 import bcrypt from 'bcrypt';
 
-// palavra secreta
 const SECRET = process.env.JWT_SECRET || 'bananinha';
-
-// pool de conexão ao banco de dados
 const database = new DataBaseModel().pool;
 
 /**
- * Interface para representar um Payload do JWT
+ * Interface para estender o Payload do JWT com dados do usuário
  */
-interface JwtPayload {
+interface JwtPayload extends BaseJwtPayload {
     id: string;
     nome: string;
     username: string;
+    imagemPerfil?: string; 
     exp: number;
+}
+
+/**
+ * Interface customizada para resolver o erro TS2339 (userId, nome, etc.).
+ */
+interface CustomRequest extends Request {
+    userId?: string;
+    nome?: string;
+    username?: string;
+    imagemPerfil?: string;
 }
 
 /**
@@ -32,7 +41,7 @@ export class Auth {
         const { email, senha } = req.body;
 
         const querySelectUser = `
-            SELECT uuid, nome, email, senha, username 
+            SELECT uuid, nome, email, senha, username, imagem_perfil
             FROM usuario 
             WHERE LOWER(email) = LOWER($1) AND status_usuario = TRUE;
         `;
@@ -45,7 +54,6 @@ export class Auth {
             }
 
             const usuarioBanco = queryResult.rows[0];
-
             const senhaValida = await bcrypt.compare(senha, usuarioBanco.senha);
 
             if (!senhaValida) {
@@ -56,18 +64,23 @@ export class Auth {
                 uuid: usuarioBanco.uuid,
                 nome: usuarioBanco.nome,
                 email: usuarioBanco.email,
-                username: usuarioBanco.username
+                username: usuarioBanco.username,
+                imagemPerfil: usuarioBanco.imagem_perfil
             };
 
-            const tokenUsuario = Auth.generateToken(usuarioBanco.uuid, usuario.nome, usuario.username);
+            const tokenUsuario = Auth.generateToken(
+                usuarioBanco.uuid, 
+                usuario.nome, 
+                usuario.username,
+                usuario.imagemPerfil
+            );
 
 
-            // 🔑 Envia token no cookie HttpOnly
+            // 🚨 CORREÇÃO CRÍTICA: REMOÇÃO de httpOnly para permitir exclusão pelo Frontend
             res.cookie("token", tokenUsuario, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === "production", // só força secure em produção
-                sameSite: "strict", // use o mesmo aqui e no logout
-                maxAge: 1000 * 60 * 60 // 1h
+                // REMOVIDO: httpOnly: true (Permite acesso/limpeza via JS no Front-end)
+                maxAge: 1000 * 60 * 60, // 1h
+                path: "/" 
             });
 
             return res.status(200).json({ auth: true, usuario });
@@ -81,15 +94,15 @@ export class Auth {
     /**
      * Gera token JWT
      */
-    static generateToken(id: string, nome: string, username: string) {
-        return jwt.sign({ id, nome, username }, SECRET, { expiresIn: "1h" });
+    static generateToken(id: string, nome: string, username: string, imagemPerfil?: string) {
+        return jwt.sign({ id, nome, username, imagemPerfil }, SECRET, { expiresIn: "1h" });
     }
 
 
     /**
      * Verifica token do cookie
      */
-    static verifyToken(req: Request, res: Response, next: NextFunction): void {
+    static verifyToken(req: CustomRequest, res: Response, next: NextFunction): void { 
         const token = req.cookies?.token;
 
         if (!token) {
@@ -99,8 +112,7 @@ export class Auth {
 
         try {
             const decoded = jwt.verify(token, SECRET) as JwtPayload;
-
-            const { exp, id, nome, username } = decoded;
+            const { exp, id, nome, username, imagemPerfil } = decoded; 
 
             if (!exp || !id) {
                 res.status(401).json({ message: "Token inválido, faça login", auth: false });
@@ -113,9 +125,11 @@ export class Auth {
                 return;
             }
 
-            req.body.userId = id;
-            req.body.nome = nome;
-            req.body.username = username;
+            // Injeta dados do usuário na requisição
+            req.userId = id;
+            req.nome = nome;
+            req.username = username;
+            req.imagemPerfil = imagemPerfil; 
 
             next();
         } catch (err) {
@@ -124,18 +138,19 @@ export class Auth {
         }
     }
 
+
     /**
      * Logout - limpa cookie
      */
     static logout(req: Request, res: Response) {
-        // Logout
-        res.clearCookie("token", {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict"
+        // 🔑 CORREÇÃO FINAL: Forçar a expiração e remover httpOnly para compatibilidade
+        res.cookie("token", "", { 
+            expires: new Date(0), // Define a data de expiração para o passado (imediata)
+            // REMOVIDO: httpOnly: true
+            path: "/" 
         });
+        
         return res.status(200).json({ message: "Logout realizado com sucesso" });
-
     }
 
     /**
@@ -160,5 +175,4 @@ export class Auth {
             return res.status(500).json({ message: "Erro ao atualizar senhas no banco de dados." });
         }
     }
-
 }

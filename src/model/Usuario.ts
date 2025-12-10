@@ -199,30 +199,46 @@ export class Usuario {
               VALUES ($1, $2, $3, $4)
               RETURNING uuid
             `;
-    
+
             const valores = [
                 usuario.getNome(),
                 usuario.getUsername(),
                 usuario.getEmail(),
-                usuario.getSenha() 
+                usuario.getSenha()
             ];
-    
+
             const resultado = await database.query(query, valores);
             const uuid = resultado.rows[0].uuid;
-    
+
             usuario.setUuidUsuario(uuid);
-    
+
             return uuid;
         } catch (error) {
             console.error('Erro ao salvar usuário:', error);
             return null;
         }
     }
-    
-    
-    
-    
-    
+
+    static async buscarNomeImagemPorUuid(uuidUsuario: string): Promise<string | null> {
+        try {
+            const query = `
+                SELECT imagem_perfil FROM usuario WHERE uuid = $1
+            `;
+            const result = await database.query(query, [uuidUsuario]);
+
+            if (result.rows.length > 0) {
+                return result.rows[0].imagem_perfil;
+            }
+            return null;
+
+        } catch (error) {
+            console.error('Erro ao buscar imagem de perfil:', error);
+            return null;
+        }
+    }
+
+
+
     /**
      * Atualiza o caminho da imagem de perfil no cadastro do usuário
      * @param uuid UUID do usuário, que representará o nome da imagem

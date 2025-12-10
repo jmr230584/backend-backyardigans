@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 CREATE TABLE cliente(
     id_cliente SERIAL PRIMARY KEY,
     nome_cliente VARCHAR(100) NOT NULL,
@@ -102,7 +104,7 @@ ADD COLUMN status_usuario BOOLEAN DEFAULT true;
 
 UPDATE usuario SET senha = encode(digest(senha, 'sha1'), 'hex');
 
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 
 ALTER TABLE usuario ADD COLUMN imagem_perfil VARCHAR(100);
 
@@ -112,5 +114,9 @@ ALTER COLUMN senha TYPE VARCHAR(255);
 
 DROP TRIGGER IF EXISTS trigger_gerar_senha ON usuario;
 DROP FUNCTION IF EXISTS gerar_senha_padrao;
+
+ALTER TABLE usuario ALTER COLUMN imagem_perfil DROP NOT NULL;
+
+ALTER TABLE Usuario ALTER COLUMN senha TYPE VARCHAR(100);
 
 
